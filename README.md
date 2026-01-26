@@ -1,137 +1,131 @@
-# Core PHP Framework Project
+# Core Tenant
 
-[![CI](https://github.com/host-uk/core-template/actions/workflows/ci.yml/badge.svg)](https://github.com/host-uk/core-template/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/host-uk/core-template/graph/badge.svg)](https://codecov.io/gh/host-uk/core-template)
-[![PHP Version](https://img.shields.io/packagist/php-v/host-uk/core-template)](https://packagist.org/packages/host-uk/core-template)
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel)](https://laravel.com)
+[![CI](https://github.com/host-uk/core-tenant/actions/workflows/ci.yml/badge.svg)](https://github.com/host-uk/core-tenant/actions/workflows/ci.yml)
+[![PHP Version](https://img.shields.io/packagist/php-v/host-uk/core-tenant)](https://packagist.org/packages/host-uk/core-tenant)
+[![Laravel](https://img.shields.io/badge/Laravel-11.x%20%7C%2012.x-FF2D20?logo=laravel)](https://laravel.com)
 [![License](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
 
-A modular monolith Laravel application built with Core PHP Framework.
+Multi-tenancy module for the Core PHP Framework providing users, workspaces, and entitlements.
 
 ## Features
 
-- **Core Framework** - Event-driven module system with lazy loading
-- **Admin Panel** - Livewire-powered admin interface with Flux UI
-- **REST API** - Scoped API keys, rate limiting, webhooks, OpenAPI docs
-- **MCP Tools** - Model Context Protocol for AI agent integration
+- **Users & Authentication** - User management with 2FA support
+- **Workspaces** - Multi-tenant workspace boundaries
+- **Entitlements** - Feature access, packages, and usage tracking
+- **Account Management** - User settings, account deletion
+- **Referrals** - Referral system support
+- **Usage Alerts** - Configurable usage threshold alerts
 
 ## Requirements
 
 - PHP 8.2+
-- Composer 2.x
-- SQLite (default) or MySQL/PostgreSQL
-- Node.js 18+ (for frontend assets)
+- Laravel 11.x or 12.x
+- Core PHP Framework (`host-uk/core`)
 
 ## Installation
 
 ```bash
-# Clone or create from template
-git clone https://github.com/host-uk/core-template.git my-project
-cd my-project
-
-# Install dependencies
-composer install
-npm install
-
-# Configure environment
-cp .env.example .env
-php artisan key:generate
-
-# Set up database
-touch database/database.sqlite
-php artisan migrate
-
-# Start development server
-php artisan serve
+composer require host-uk/core-tenant
 ```
 
-Visit: http://localhost:8000
+The service provider will be auto-discovered.
 
-## Project Structure
-
-```
-app/
-├── Console/      # Artisan commands
-├── Http/         # Controllers & Middleware
-├── Models/       # Eloquent models
-├── Mod/          # Your custom modules
-└── Providers/    # Service providers
-
-config/
-└── core.php      # Core framework configuration
-
-routes/
-├── web.php       # Public web routes
-├── api.php       # REST API routes
-└── console.php   # Artisan commands
-```
-
-## Creating Modules
+Run migrations:
 
 ```bash
-# Create a new module with all features
-php artisan make:mod Blog --all
-
-# Create module with specific features
-php artisan make:mod Shop --web --api --admin
+php artisan migrate
 ```
 
-Modules follow the event-driven pattern:
+## Usage
+
+### Workspace Management
 
 ```php
-<?php
+use Core\Mod\Tenant\Services\WorkspaceManager;
+use Core\Mod\Tenant\Services\WorkspaceService;
 
-namespace App\Mod\Blog;
+// Get current workspace
+$workspace = app(WorkspaceManager::class)->current();
 
-use Core\Events\WebRoutesRegistering;
-use Core\Events\ApiRoutesRegistering;
-use Core\Events\AdminPanelBooting;
-
-class Boot
-{
-    public static array $listens = [
-        WebRoutesRegistering::class => 'onWebRoutes',
-        ApiRoutesRegistering::class => 'onApiRoutes',
-        AdminPanelBooting::class => 'onAdminPanel',
-    ];
-
-    public function onWebRoutes(WebRoutesRegistering $event): void
-    {
-        $event->routes(fn() => require __DIR__.'/Routes/web.php');
-        $event->views('blog', __DIR__.'/Views');
-    }
-}
+// Create a new workspace
+$workspace = app(WorkspaceService::class)->create([
+    'name' => 'My Workspace',
+    'owner_id' => $user->id,
+]);
 ```
 
-## Core Packages
+### Entitlements
 
-| Package | Description |
-|---------|-------------|
-| `host-uk/core` | Core framework components |
-| `host-uk/core-admin` | Admin panel & Livewire modals |
-| `host-uk/core-api` | REST API with scopes & webhooks |
-| `host-uk/core-mcp` | Model Context Protocol tools |
+```php
+use Core\Mod\Tenant\Services\EntitlementService;
 
-## Flux Pro (Optional)
+$entitlements = app(EntitlementService::class);
 
-This template uses the free Flux UI components. If you have a Flux Pro license:
+// Check if workspace has access to a feature
+if ($entitlements->hasAccess($workspace, 'premium_feature')) {
+    // Feature is enabled
+}
+
+// Check usage limits
+$usage = $entitlements->getUsage($workspace, 'api_calls');
+```
+
+### Middleware
+
+The module provides middleware for workspace-based access control:
+
+```php
+// In your routes
+Route::middleware('workspace.permission:manage-users')->group(function () {
+    // Routes requiring manage-users permission
+});
+```
+
+## Models
+
+| Model | Description |
+|-------|-------------|
+| `User` | Application users |
+| `Workspace` | Tenant workspace boundaries |
+| `WorkspaceMember` | Workspace membership with roles |
+| `Entitlement` | Feature/package entitlements |
+| `UsageRecord` | Usage tracking records |
+| `Referral` | Referral tracking |
+
+## Events
+
+The module fires events for key actions:
+
+- `WorkspaceCreated`
+- `WorkspaceMemberAdded`
+- `WorkspaceMemberRemoved`
+- `EntitlementChanged`
+- `UsageAlertTriggered`
+
+## Artisan Commands
 
 ```bash
-# Configure authentication
-composer config http-basic.composer.fluxui.dev your-email your-license-key
+# Refresh user statistics
+php artisan tenant:refresh-user-stats
 
-# Add the repository
-composer config repositories.flux-pro composer https://composer.fluxui.dev
+# Process scheduled account deletions
+php artisan tenant:process-deletions
 
-# Install Flux Pro
-composer require livewire/flux-pro
+# Check usage alerts
+php artisan tenant:check-usage-alerts
+
+# Reset billing cycles
+php artisan tenant:reset-billing-cycles
 ```
+
+## Configuration
+
+The module uses the Core PHP configuration system. Key settings can be configured per-workspace or system-wide.
 
 ## Documentation
 
 - [Core PHP Framework](https://github.com/host-uk/core-php)
 - [Getting Started Guide](https://host-uk.github.io/core-php/guide/)
-- [Architecture](https://host-uk.github.io/core-php/architecture/)
 
 ## License
 

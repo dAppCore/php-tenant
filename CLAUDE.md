@@ -1,66 +1,73 @@
-# Core PHP Framework Project
+# Core Tenant
+
+Multi-tenancy module for Core PHP Framework.
+
+## Quick Reference
+
+```bash
+composer test                 # Run tests
+composer pint                 # Fix code style
+```
 
 ## Architecture
 
-Modular monolith using Core PHP Framework. Modules live in `app/Mod/{Name}/Boot.php`.
+This module provides the multi-tenancy foundation:
 
-**Event-driven registration:**
-```php
-class Boot
-{
-    public static array $listens = [
-        WebRoutesRegistering::class => 'onWebRoutes',
-        ApiRoutesRegistering::class => 'onApiRoutes',
-        AdminPanelBooting::class => 'onAdminPanel',
-    ];
-}
+- **Users** - Application users with 2FA support
+- **Workspaces** - Tenant boundaries with team members
+- **Entitlements** - Feature access, packages, usage tracking
+- **Account Management** - Settings, scheduled deletions
+
+### Key Services
+
+| Service | Purpose |
+|---------|---------|
+| `WorkspaceManager` | Current workspace context |
+| `WorkspaceService` | Workspace CRUD operations |
+| `EntitlementService` | Feature access & usage |
+| `UserStatsService` | User statistics |
+| `UsageAlertService` | Usage threshold alerts |
+
+### Models
+
+```
+src/Models/
+├── User.php              # Application user
+├── Workspace.php         # Tenant workspace
+├── WorkspaceMember.php   # Membership with roles
+├── Entitlement.php       # Feature entitlements
+├── UsageRecord.php       # Usage tracking
+└── Referral.php          # Referral tracking
 ```
 
-## Commands
+### Middleware
+
+- `RequireAdminDomain` - Restrict to admin domain
+- `CheckWorkspacePermission` - Permission-based access
+
+## Event Listeners
+
+```php
+public static array $listens = [
+    AdminPanelBooting::class => 'onAdminPanel',
+    ApiRoutesRegistering::class => 'onApiRoutes',
+    WebRoutesRegistering::class => 'onWebRoutes',
+    ConsoleBooting::class => 'onConsole',
+];
+```
+
+## Namespace
+
+All classes use `Core\Mod\Tenant\` namespace.
+
+## Testing
+
+Tests use Orchestra Testbench. Run with:
 
 ```bash
-composer run dev              # Dev server (if configured)
-php artisan serve             # Laravel dev server
-npm run dev                   # Vite
-./vendor/bin/pint --dirty     # Format changed files
-php artisan test              # All tests
-php artisan make:mod Blog     # Create module
+composer test
 ```
-
-## Module Structure
-
-```
-app/Mod/Blog/
-├── Boot.php              # Event listeners
-├── Models/               # Eloquent models
-├── Routes/
-│   ├── web.php          # Web routes
-│   └── api.php          # API routes
-├── Views/               # Blade templates
-├── Livewire/            # Livewire components
-├── Migrations/          # Database migrations
-└── Tests/               # Module tests
-```
-
-## Packages
-
-| Package | Purpose |
-|---------|---------|
-| `host-uk/core` | Core framework, events, module discovery |
-| `host-uk/core-admin` | Admin panel, Livewire modals |
-| `host-uk/core-api` | REST API, scopes, rate limiting, webhooks |
-| `host-uk/core-mcp` | Model Context Protocol for AI agents |
-
-## Conventions
-
-- UK English (colour, organisation, centre)
-- PSR-12 coding style (Laravel Pint)
-- Pest for testing
-- Livewire + Flux Pro for UI
 
 ## License
 
-- `Core\` namespace and vendor packages: EUPL-1.2 (copyleft)
-- `app/Mod/*`, `app/Website/*`: Your choice (no copyleft)
-
-See LICENSE for full details.
+EUPL-1.2 (copyleft, GPL-compatible).
