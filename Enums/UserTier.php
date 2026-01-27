@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Mod\Tenant\Enums;
+namespace Core\Tenant\Enums;
 
 enum UserTier: string
 {

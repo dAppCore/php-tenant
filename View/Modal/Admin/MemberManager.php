@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\View\Modal\Admin;
+namespace Core\Tenant\View\Modal\Admin;
 
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Models\WorkspaceMember;
-use Core\Mod\Tenant\Models\WorkspaceTeam;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspaceMember;
+use Core\Tenant\Models\WorkspaceTeam;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

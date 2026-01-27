@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Tenant\Services;
 
 /**
  * Value object representing the result of an entitlement check.

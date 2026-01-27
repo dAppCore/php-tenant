@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Models;
+namespace Core\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

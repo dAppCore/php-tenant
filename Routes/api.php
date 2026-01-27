@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 
 use Core\Mod\Api\Controllers\WorkspaceController;
-use Core\Mod\Tenant\Controllers\Api\EntitlementWebhookController;
+use Core\Tenant\Controllers\Api\EntitlementWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*

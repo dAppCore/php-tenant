@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Models;
+namespace Core\Tenant\Models;
 
-use Core\Mod\Tenant\Contracts\EntitlementWebhookEvent;
-use Core\Mod\Tenant\Enums\WebhookDeliveryStatus;
+use Core\Tenant\Contracts\EntitlementWebhookEvent;
+use Core\Tenant\Enums\WebhookDeliveryStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

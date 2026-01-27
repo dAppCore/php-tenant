@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Controllers\Api;
+namespace Core\Tenant\Controllers\Api;
 
-use Core\Mod\Tenant\Models\EntitlementWebhook;
-use Core\Mod\Tenant\Models\EntitlementWebhookDelivery;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\EntitlementWebhookService;
+use Core\Tenant\Models\EntitlementWebhook;
+use Core\Tenant\Models\EntitlementWebhookDelivery;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Services\EntitlementWebhookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

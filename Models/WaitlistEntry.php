@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Mod\Tenant\Models;
+namespace Core\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,9 +13,9 @@ class WaitlistEntry extends Model
     use HasFactory;
     use Notifiable;
 
-    protected static function newFactory(): \Core\Mod\Tenant\Database\Factories\WaitlistEntryFactory
+    protected static function newFactory(): \Core\Tenant\Database\Factories\WaitlistEntryFactory
     {
-        return \Core\Mod\Tenant\Database\Factories\WaitlistEntryFactory::new();
+        return \Core\Tenant\Database\Factories\WaitlistEntryFactory::new();
     }
 
     protected $fillable = [

@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Mod\Tenant\Models;
+namespace Core\Tenant\Models;
 
-use Core\Mod\Tenant\Services\EntitlementResult;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Tenant\Services\EntitlementResult;
+use Core\Tenant\Services\EntitlementService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,9 +14,9 @@ class Workspace extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): \Core\Mod\Tenant\Database\Factories\WorkspaceFactory
+    protected static function newFactory(): \Core\Tenant\Database\Factories\WorkspaceFactory
     {
-        return \Core\Mod\Tenant\Database\Factories\WorkspaceFactory::new();
+        return \Core\Tenant\Database\Factories\WorkspaceFactory::new();
     }
 
     protected $fillable = [
@@ -577,7 +577,7 @@ class Workspace extends Model
         }
 
         // Try to get from authenticated user's default workspace
-        if (auth()->check() && auth()->user() instanceof \Core\Mod\Tenant\Models\User) {
+        if (auth()->check() && auth()->user() instanceof \Core\Tenant\Models\User) {
             return auth()->user()->defaultHostWorkspace();
         }
 
@@ -680,7 +680,7 @@ class Workspace extends Model
         ]);
 
         // Send notification
-        $invitation->notify(new \Core\Mod\Tenant\Notifications\WorkspaceInvitationNotification($invitation));
+        $invitation->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($invitation));
 
         return $invitation;
     }

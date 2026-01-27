@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Tenant\Services;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
-use Core\Mod\Tenant\Contracts\TwoFactorAuthenticationProvider;
+use Core\Tenant\Contracts\TwoFactorAuthenticationProvider;
 
 /**
  * TOTP (Time-based One-Time Password) service.

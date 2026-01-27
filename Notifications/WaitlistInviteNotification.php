@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Notifications;
+namespace Core\Tenant\Notifications;
 
-use Core\Mod\Tenant\Models\WaitlistEntry;
+use Core\Tenant\Models\WaitlistEntry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;

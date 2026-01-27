@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Tenant\Services;
 
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Models\WorkspaceMember;
-use Core\Mod\Tenant\Models\WorkspaceTeam;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspaceMember;
+use Core\Tenant\Models\WorkspaceTeam;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

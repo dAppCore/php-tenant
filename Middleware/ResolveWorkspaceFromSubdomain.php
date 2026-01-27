@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Middleware;
+namespace Core\Tenant\Middleware;
 
 use Closure;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\WorkspaceService;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Services\WorkspaceService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

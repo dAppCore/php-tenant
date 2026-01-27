@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Enums;
+namespace Core\Tenant\Enums;
 
 enum WebhookDeliveryStatus: string
 {

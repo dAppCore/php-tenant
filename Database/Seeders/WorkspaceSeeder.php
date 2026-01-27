@@ -1,12 +1,12 @@
 <?php
 
-namespace Core\Mod\Tenant\Database\Seeders;
+namespace Core\Tenant\Database\Seeders;
 
-use Core\Mod\Tenant\Enums\UserTier;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Models\WorkspacePackage;
+use Core\Tenant\Enums\UserTier;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspacePackage;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;

@@ -1,10 +1,10 @@
 <?php
 
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Tenant\Models\Feature;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Services\EntitlementService;
 use Illuminate\Support\Facades\Cache;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);

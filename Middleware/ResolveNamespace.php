@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Middleware;
+namespace Core\Tenant\Middleware;
 
 use Closure;
-use Core\Mod\Tenant\Services\NamespaceService;
+use Core\Tenant\Services\NamespaceService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

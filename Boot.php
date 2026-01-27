@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant;
+namespace Core\Tenant;
 
 use Core\Events\AdminPanelBooting;
 use Core\Events\ApiRoutesRegistering;
@@ -40,48 +40,48 @@ class Boot extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(
-            \Core\Mod\Tenant\Contracts\TwoFactorAuthenticationProvider::class,
-            \Core\Mod\Tenant\Services\TotpService::class
+            \Core\Tenant\Contracts\TwoFactorAuthenticationProvider::class,
+            \Core\Tenant\Services\TotpService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\EntitlementService::class,
-            \Core\Mod\Tenant\Services\EntitlementService::class
+            \Core\Tenant\Services\EntitlementService::class,
+            \Core\Tenant\Services\EntitlementService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\WorkspaceManager::class,
-            \Core\Mod\Tenant\Services\WorkspaceManager::class
+            \Core\Tenant\Services\WorkspaceManager::class,
+            \Core\Tenant\Services\WorkspaceManager::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\UserStatsService::class,
-            \Core\Mod\Tenant\Services\UserStatsService::class
+            \Core\Tenant\Services\UserStatsService::class,
+            \Core\Tenant\Services\UserStatsService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\WorkspaceService::class,
-            \Core\Mod\Tenant\Services\WorkspaceService::class
+            \Core\Tenant\Services\WorkspaceService::class,
+            \Core\Tenant\Services\WorkspaceService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\WorkspaceCacheManager::class,
-            \Core\Mod\Tenant\Services\WorkspaceCacheManager::class
+            \Core\Tenant\Services\WorkspaceCacheManager::class,
+            \Core\Tenant\Services\WorkspaceCacheManager::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\UsageAlertService::class,
-            \Core\Mod\Tenant\Services\UsageAlertService::class
+            \Core\Tenant\Services\UsageAlertService::class,
+            \Core\Tenant\Services\UsageAlertService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\EntitlementWebhookService::class,
-            \Core\Mod\Tenant\Services\EntitlementWebhookService::class
+            \Core\Tenant\Services\EntitlementWebhookService::class,
+            \Core\Tenant\Services\EntitlementWebhookService::class
         );
 
         $this->app->singleton(
-            \Core\Mod\Tenant\Services\WorkspaceTeamService::class,
-            \Core\Mod\Tenant\Services\WorkspaceTeamService::class
+            \Core\Tenant\Services\WorkspaceTeamService::class,
+            \Core\Tenant\Services\WorkspaceTeamService::class
         );
 
         $this->registerBackwardCompatAliases();
@@ -91,28 +91,28 @@ class Boot extends ServiceProvider
     {
         if (! class_exists(\App\Services\WorkspaceManager::class)) {
             class_alias(
-                \Core\Mod\Tenant\Services\WorkspaceManager::class,
+                \Core\Tenant\Services\WorkspaceManager::class,
                 \App\Services\WorkspaceManager::class
             );
         }
 
         if (! class_exists(\App\Services\UserStatsService::class)) {
             class_alias(
-                \Core\Mod\Tenant\Services\UserStatsService::class,
+                \Core\Tenant\Services\UserStatsService::class,
                 \App\Services\UserStatsService::class
             );
         }
 
         if (! class_exists(\App\Services\WorkspaceService::class)) {
             class_alias(
-                \Core\Mod\Tenant\Services\WorkspaceService::class,
+                \Core\Tenant\Services\WorkspaceService::class,
                 \App\Services\WorkspaceService::class
             );
         }
 
         if (! class_exists(\App\Services\WorkspaceCacheManager::class)) {
             class_alias(
-                \Core\Mod\Tenant\Services\WorkspaceCacheManager::class,
+                \Core\Tenant\Services\WorkspaceCacheManager::class,
                 \App\Services\WorkspaceCacheManager::class
             );
         }

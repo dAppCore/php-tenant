@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Rules;
+namespace Core\Tenant\Rules;
 
 use Closure;
-use Core\Mod\Tenant\Models\User;
+use Core\Tenant\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Hash;
 

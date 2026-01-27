@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Middleware;
+namespace Core\Tenant\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;

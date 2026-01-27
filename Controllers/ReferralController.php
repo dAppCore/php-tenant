@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Controllers;
+namespace Core\Tenant\Controllers;
 
 use Core\Helpers\PrivacyHelper;
 use Core\Mod\Trees\Models\TreePlanting;

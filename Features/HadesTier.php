@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Features;
+namespace Core\Tenant\Features;
 
-use Core\Mod\Tenant\Enums\UserTier;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Tenant\Enums\UserTier;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Services\EntitlementService;
 
 class HadesTier
 {

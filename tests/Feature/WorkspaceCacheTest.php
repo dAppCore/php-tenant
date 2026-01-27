@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Tests\Feature;
+namespace Core\Tenant\Tests\Feature;
 
 use Core\Mod\Social\Models\Account;
-use Core\Mod\Tenant\Concerns\BelongsToWorkspace;
-use Core\Mod\Tenant\Concerns\HasWorkspaceCache;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Scopes\WorkspaceScope;
-use Core\Mod\Tenant\Services\WorkspaceCacheManager;
+use Core\Tenant\Concerns\BelongsToWorkspace;
+use Core\Tenant\Concerns\HasWorkspaceCache;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Scopes\WorkspaceScope;
+use Core\Tenant\Services\WorkspaceCacheManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;

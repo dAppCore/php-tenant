@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Scopes;
+namespace Core\Tenant\Scopes;
 
-use Core\Mod\Tenant\Exceptions\MissingWorkspaceContextException;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Tenant\Exceptions\MissingWorkspaceContextException;
+use Core\Tenant\Models\Workspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;

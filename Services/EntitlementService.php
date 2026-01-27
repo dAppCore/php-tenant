@@ -1,17 +1,17 @@
 <?php
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Tenant\Services;
 
-use Core\Mod\Tenant\Models\Boost;
-use Core\Mod\Tenant\Models\EntitlementLog;
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Namespace_;
-use Core\Mod\Tenant\Models\NamespacePackage;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\UsageRecord;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Models\WorkspacePackage;
+use Core\Tenant\Models\Boost;
+use Core\Tenant\Models\EntitlementLog;
+use Core\Tenant\Models\Feature;
+use Core\Tenant\Models\Namespace_;
+use Core\Tenant\Models\NamespacePackage;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\UsageRecord;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspacePackage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 

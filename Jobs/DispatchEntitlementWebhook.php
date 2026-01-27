@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Jobs;
+namespace Core\Tenant\Jobs;
 
-use Core\Mod\Tenant\Enums\WebhookDeliveryStatus;
-use Core\Mod\Tenant\Models\EntitlementWebhook;
+use Core\Tenant\Enums\WebhookDeliveryStatus;
+use Core\Tenant\Models\EntitlementWebhook;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

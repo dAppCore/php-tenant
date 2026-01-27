@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Concerns;
+namespace Core\Tenant\Concerns;
 
 use Closure;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\WorkspaceCacheManager;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Services\WorkspaceCacheManager;
 use Illuminate\Support\Collection;
 
 /**

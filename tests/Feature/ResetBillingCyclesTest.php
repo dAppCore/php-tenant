@@ -1,14 +1,14 @@
 <?php
 
-use Core\Mod\Tenant\Models\Boost;
-use Core\Mod\Tenant\Models\EntitlementLog;
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\UsageRecord;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Notifications\BoostExpiredNotification;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Tenant\Models\Boost;
+use Core\Tenant\Models\EntitlementLog;
+use Core\Tenant\Models\Feature;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\UsageRecord;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Notifications\BoostExpiredNotification;
+use Core\Tenant\Services\EntitlementService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 

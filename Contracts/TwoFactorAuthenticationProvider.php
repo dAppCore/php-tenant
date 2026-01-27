@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Contracts;
+namespace Core\Tenant\Contracts;
 
 /**
  * Contract for two-factor authentication providers.

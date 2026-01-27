@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Mod\Tenant\View\Modal\Admin;
+namespace Core\Tenant\View\Modal\Admin;
 
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Concerns;
+namespace Core\Tenant\Concerns;
 
-use Core\Mod\Tenant\Exceptions\MissingWorkspaceContextException;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Scopes\WorkspaceScope;
-use Core\Mod\Tenant\Services\WorkspaceCacheManager;
+use Core\Tenant\Exceptions\MissingWorkspaceContextException;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Scopes\WorkspaceScope;
+use Core\Tenant\Services\WorkspaceCacheManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Tenant\Services;
 
-use Core\Mod\Tenant\Events\Webhook\LimitReachedEvent;
-use Core\Mod\Tenant\Events\Webhook\LimitWarningEvent;
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\UsageAlertHistory;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Notifications\UsageAlertNotification;
+use Core\Tenant\Events\Webhook\LimitReachedEvent;
+use Core\Tenant\Events\Webhook\LimitWarningEvent;
+use Core\Tenant\Models\Feature;
+use Core\Tenant\Models\UsageAlertHistory;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Notifications\UsageAlertNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
