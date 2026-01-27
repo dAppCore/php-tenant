@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Listeners;
+namespace Core\Core\Tenant\Listeners;
 
-use Core\Mod\Tenant\Notifications\WelcomeNotification;
+use Core\Core\Tenant\Notifications\WelcomeNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Queue\ShouldQueue;
 

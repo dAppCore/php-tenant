@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Exceptions;
+namespace Core\Core\Tenant\Exceptions;
 
 use Exception;
 

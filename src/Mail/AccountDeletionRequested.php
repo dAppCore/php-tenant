@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Mail;
+namespace Core\Core\Tenant\Mail;
 
-use Core\Mod\Tenant\Models\AccountDeletionRequest;
+use Core\Core\Tenant\Models\AccountDeletionRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;

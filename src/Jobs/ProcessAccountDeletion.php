@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Jobs;
+namespace Core\Core\Tenant\Jobs;
 
-use Core\Mod\Tenant\Models\AccountDeletionRequest;
+use Core\Core\Tenant\Models\AccountDeletionRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Concerns;
+namespace Core\Core\Tenant\Concerns;
 
-use Core\Mod\Tenant\Contracts\TwoFactorAuthenticationProvider;
-use Core\Mod\Tenant\Models\UserTwoFactorAuth;
-use Core\Mod\Tenant\Services\TotpService;
+use Core\Core\Tenant\Contracts\TwoFactorAuthenticationProvider;
+use Core\Core\Tenant\Models\UserTwoFactorAuth;
+use Core\Core\Tenant\Services\TotpService;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**

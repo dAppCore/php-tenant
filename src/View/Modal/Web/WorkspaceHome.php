@@ -1,10 +1,10 @@
 <?php
 
-namespace Core\Mod\Tenant\View\Modal\Web;
+namespace Core\Core\Tenant\View\Modal\Web;
 
 use Core\Mod\Content\Services\ContentRender;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\WorkspaceService;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Services\WorkspaceService;
 use Livewire\Component;
 
 class WorkspaceHome extends Component

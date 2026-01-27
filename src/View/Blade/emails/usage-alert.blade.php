@@ -1,7 +1,7 @@
 @php
     $appName = config('core.app.name', __('core::core.brand.name'));
-    $isLimit = $threshold === \Core\Mod\Tenant\Models\UsageAlertHistory::THRESHOLD_LIMIT;
-    $isCritical = $threshold === \Core\Mod\Tenant\Models\UsageAlertHistory::THRESHOLD_CRITICAL;
+    $isLimit = $threshold === \Core\Core\Tenant\Models\UsageAlertHistory::THRESHOLD_LIMIT;
+    $isCritical = $threshold === \Core\Core\Tenant\Models\UsageAlertHistory::THRESHOLD_CRITICAL;
 @endphp
 
 <x-mail::message>

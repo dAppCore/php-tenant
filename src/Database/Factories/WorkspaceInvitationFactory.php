@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Database\Factories;
+namespace Core\Core\Tenant\Database\Factories;
 
-use Core\Mod\Tenant\Models\WorkspaceInvitation;
+use Core\Core\Tenant\Models\WorkspaceInvitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Mod\Tenant\Models\WorkspaceInvitation>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Core\Tenant\Models\WorkspaceInvitation>
  */
 class WorkspaceInvitationFactory extends Factory
 {

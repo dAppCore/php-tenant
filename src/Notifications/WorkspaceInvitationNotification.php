@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Notifications;
+namespace Core\Core\Tenant\Notifications;
 
-use Core\Mod\Tenant\Models\WorkspaceInvitation;
+use Core\Core\Tenant\Models\WorkspaceInvitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Core\Mod\Tenant\Database\Seeders;
+namespace Core\Core\Tenant\Database\Seeders;
 
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Core\Tenant\Models\Feature;
+use Core\Core\Tenant\Models\Package;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Services\EntitlementService;
 use Illuminate\Database\Seeder;
 
 /**

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Core\Tenant\Services;
 
 use Closure;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Models\Workspace;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;

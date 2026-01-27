@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Features;
+namespace Core\Core\Tenant\Features;
 
 use Illuminate\Support\Lottery;
 

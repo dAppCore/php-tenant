@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Middleware;
+namespace Core\Core\Tenant\Middleware;
 
 use Closure;
-use Core\Mod\Tenant\Exceptions\MissingWorkspaceContextException;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Exceptions\MissingWorkspaceContextException;
+use Core\Core\Tenant\Models\Workspace;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   });
  *
  * Register in Kernel.php:
- *   'workspace.required' => \Core\Mod\Tenant\Middleware\RequireWorkspaceContext::class,
+ *   'workspace.required' => \Core\Core\Tenant\Middleware\RequireWorkspaceContext::class,
  */
 class RequireWorkspaceContext
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Console\Commands;
+namespace Core\Core\Tenant\Console\Commands;
 
-use Core\Mod\Tenant\Models\AccountDeletionRequest;
+use Core\Core\Tenant\Models\AccountDeletionRequest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

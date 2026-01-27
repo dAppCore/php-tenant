@@ -125,7 +125,7 @@ The module uses the Core PHP configuration system. Key settings can be configure
 ## Documentation
 
 - [Core PHP Framework](https://github.com/host-uk/core-php)
-- [Getting Started Guide](https://host-uk.github.io/core-php/guide/)
+- [Getting Started Guide](https://core.help/guide/)
 
 ## License
 

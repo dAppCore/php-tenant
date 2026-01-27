@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Rules;
+namespace Core\Core\Tenant\Rules;
 
 use Closure;
 use Core\Mod\Social\Enums\ResourceStatus;

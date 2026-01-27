@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Tests\Feature;
+namespace Core\Core\Tenant\Tests\Feature;
 
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\UsageAlertHistory;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Notifications\UsageAlertNotification;
-use Core\Mod\Tenant\Services\EntitlementService;
-use Core\Mod\Tenant\Services\UsageAlertService;
+use Core\Core\Tenant\Models\Feature;
+use Core\Core\Tenant\Models\Package;
+use Core\Core\Tenant\Models\UsageAlertHistory;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Notifications\UsageAlertNotification;
+use Core\Core\Tenant\Services\EntitlementService;
+use Core\Core\Tenant\Services\UsageAlertService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;

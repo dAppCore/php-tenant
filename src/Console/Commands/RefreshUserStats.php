@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Console\Commands;
+namespace Core\Core\Tenant\Console\Commands;
 
-use Core\Mod\Tenant\Jobs\ComputeUserStats;
-use Core\Mod\Tenant\Models\User;
+use Core\Core\Tenant\Jobs\ComputeUserStats;
+use Core\Core\Tenant\Models\User;
 use Illuminate\Console\Command;
 
 class RefreshUserStats extends Command

@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Mod\Tenant\View\Modal\Web;
+namespace Core\Core\Tenant\View\Modal\Web;
 
-use Core\Mod\Tenant\Models\AccountDeletionRequest;
+use Core\Core\Tenant\Models\AccountDeletionRequest;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 

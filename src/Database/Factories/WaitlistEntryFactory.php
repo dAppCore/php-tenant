@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Database\Factories;
+namespace Core\Core\Tenant\Database\Factories;
 
-use Core\Mod\Tenant\Models\WaitlistEntry;
+use Core\Core\Tenant\Models\WaitlistEntry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Mod\Tenant\Models\WaitlistEntry>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Core\Tenant\Models\WaitlistEntry>
  */
 class WaitlistEntryFactory extends Factory
 {

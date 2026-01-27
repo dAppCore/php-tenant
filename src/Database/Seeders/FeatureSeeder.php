@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Mod\Tenant\Database\Seeders;
+namespace Core\Core\Tenant\Database\Seeders;
 
-use Core\Mod\Tenant\Models\Feature;
+use Core\Core\Tenant\Models\Feature;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 

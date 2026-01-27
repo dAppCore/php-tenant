@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Concerns;
+namespace Core\Core\Tenant\Concerns;
 
-use Core\Mod\Tenant\Models\Namespace_;
-use Core\Mod\Tenant\Models\User;
+use Core\Core\Tenant\Models\Namespace_;
+use Core\Core\Tenant\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;

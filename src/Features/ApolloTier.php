@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Features;
+namespace Core\Core\Tenant\Features;
 
-use Core\Mod\Tenant\Enums\UserTier;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Core\Tenant\Enums\UserTier;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Services\EntitlementService;
 
 class ApolloTier
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Database\Factories;
+namespace Core\Core\Tenant\Database\Factories;
 
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\UserToken;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\UserToken;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

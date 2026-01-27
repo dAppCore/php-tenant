@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Console\Commands;
+namespace Core\Core\Tenant\Console\Commands;
 
-use Core\Mod\Tenant\Models\Boost;
-use Core\Mod\Tenant\Models\EntitlementLog;
-use Core\Mod\Tenant\Models\UsageRecord;
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Notifications\BoostExpiredNotification;
-use Core\Mod\Tenant\Services\EntitlementService;
+use Core\Core\Tenant\Models\Boost;
+use Core\Core\Tenant\Models\EntitlementLog;
+use Core\Core\Tenant\Models\UsageRecord;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Notifications\BoostExpiredNotification;
+use Core\Core\Tenant\Services\EntitlementService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;

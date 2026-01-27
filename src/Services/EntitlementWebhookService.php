@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Services;
+namespace Core\Core\Tenant\Services;
 
-use Core\Mod\Tenant\Contracts\EntitlementWebhookEvent;
-use Core\Mod\Tenant\Enums\WebhookDeliveryStatus;
-use Core\Mod\Tenant\Events\Webhook\BoostActivatedEvent;
-use Core\Mod\Tenant\Events\Webhook\BoostExpiredEvent;
-use Core\Mod\Tenant\Events\Webhook\LimitReachedEvent;
-use Core\Mod\Tenant\Events\Webhook\LimitWarningEvent;
-use Core\Mod\Tenant\Events\Webhook\PackageChangedEvent;
-use Core\Mod\Tenant\Jobs\DispatchEntitlementWebhook;
-use Core\Mod\Tenant\Models\EntitlementWebhook;
-use Core\Mod\Tenant\Models\EntitlementWebhookDelivery;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Contracts\EntitlementWebhookEvent;
+use Core\Core\Tenant\Enums\WebhookDeliveryStatus;
+use Core\Core\Tenant\Events\Webhook\BoostActivatedEvent;
+use Core\Core\Tenant\Events\Webhook\BoostExpiredEvent;
+use Core\Core\Tenant\Events\Webhook\LimitReachedEvent;
+use Core\Core\Tenant\Events\Webhook\LimitWarningEvent;
+use Core\Core\Tenant\Events\Webhook\PackageChangedEvent;
+use Core\Core\Tenant\Jobs\DispatchEntitlementWebhook;
+use Core\Core\Tenant\Models\EntitlementWebhook;
+use Core\Core\Tenant\Models\EntitlementWebhookDelivery;
+use Core\Core\Tenant\Models\Workspace;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;

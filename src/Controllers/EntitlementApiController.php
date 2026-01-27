@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Controllers;
+namespace Core\Core\Tenant\Controllers;
 
 use Core\Front\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Mod\Tenant\Models\EntitlementLog;
-use Mod\Tenant\Models\Package;
-use Mod\Tenant\Models\User;
-use Mod\Tenant\Models\Workspace;
-use Mod\Tenant\Models\WorkspacePackage;
-use Mod\Tenant\Services\EntitlementService;
+use Core\Tenant\Models\EntitlementLog;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspacePackage;
+use Core\Tenant\Services\EntitlementService;
 
 class EntitlementApiController extends Controller
 {

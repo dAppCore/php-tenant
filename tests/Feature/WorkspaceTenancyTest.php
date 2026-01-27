@@ -1,11 +1,11 @@
 <?php
 
-namespace Core\Mod\Tenant\Tests\Feature;
+namespace Core\Core\Tenant\Tests\Feature;
 
 use Core\Mod\Analytics\Models\Website;
 use Core\Mod\Social\Models\Account;
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

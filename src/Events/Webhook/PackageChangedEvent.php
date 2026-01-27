@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Events\Webhook;
+namespace Core\Core\Tenant\Events\Webhook;
 
-use Core\Mod\Tenant\Contracts\EntitlementWebhookEvent;
-use Core\Mod\Tenant\Models\Package;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Contracts\EntitlementWebhookEvent;
+use Core\Core\Tenant\Models\Package;
+use Core\Core\Tenant\Models\Workspace;
 
 /**
  * Event fired when a workspace's package changes (upgrade, downgrade, or new assignment).

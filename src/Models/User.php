@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Mod\Tenant\Models;
+namespace Core\Core\Tenant\Models;
 
-use Core\Mod\Tenant\Enums\UserTier;
+use Core\Core\Tenant\Enums\UserTier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,9 +20,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): \Core\Mod\Tenant\Database\Factories\UserFactory
+    protected static function newFactory(): \Core\Core\Tenant\Database\Factories\UserFactory
     {
-        return \Core\Mod\Tenant\Database\Factories\UserFactory::new();
+        return \Core\Core\Tenant\Database\Factories\UserFactory::new();
     }
 
     /**

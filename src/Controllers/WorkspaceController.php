@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Controllers;
+namespace Core\Core\Tenant\Controllers;
 
 use Core\Front\Controller;
 use Illuminate\Http\JsonResponse;
@@ -11,8 +11,8 @@ use Mod\Api\Controllers\Concerns\HasApiResponses;
 use Mod\Api\Controllers\Concerns\ResolvesWorkspace;
 use Mod\Api\Resources\PaginatedCollection;
 use Mod\Api\Resources\WorkspaceResource;
-use Mod\Tenant\Models\User;
-use Mod\Tenant\Models\Workspace;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
 
 /**
  * Workspace API controller.

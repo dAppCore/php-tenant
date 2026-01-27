@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Jobs;
+namespace Core\Core\Tenant\Jobs;
 
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Services\UserStatsService;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Services\UserStatsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

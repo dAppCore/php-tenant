@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Mod\Tenant\View\Modal\Admin;
+namespace Core\Core\Tenant\View\Modal\Admin;
 
-use Core\Mod\Tenant\Models\User;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Models\User;
+use Core\Core\Tenant\Models\Workspace;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -125,7 +125,7 @@ class WorkspaceDetails extends Component
         $activities = collect();
 
         // Entitlement logs
-        if (class_exists(\Core\Mod\Tenant\Models\EntitlementLog::class)) {
+        if (class_exists(\Core\Core\Tenant\Models\EntitlementLog::class)) {
             try {
                 $logs = $this->workspace->entitlementLogs()
                     ->with('user', 'feature')
@@ -147,7 +147,7 @@ class WorkspaceDetails extends Component
         }
 
         // Usage records
-        if (class_exists(\Core\Mod\Tenant\Models\UsageRecord::class)) {
+        if (class_exists(\Core\Core\Tenant\Models\UsageRecord::class)) {
             try {
                 $usage = $this->workspace->usageRecords()
                     ->with('user', 'feature')
@@ -325,7 +325,7 @@ class WorkspaceDetails extends Component
     #[Computed]
     public function allPackages()
     {
-        return \Core\Mod\Tenant\Models\Package::active()
+        return \Core\Core\Tenant\Models\Package::active()
             ->ordered()
             ->get();
     }
@@ -333,7 +333,7 @@ class WorkspaceDetails extends Component
     #[Computed]
     public function allFeatures()
     {
-        return \Core\Mod\Tenant\Models\Feature::active()
+        return \Core\Core\Tenant\Models\Feature::active()
             ->orderBy('category')
             ->orderBy('sort_order')
             ->get();
@@ -403,7 +403,7 @@ class WorkspaceDetails extends Component
     public function resolvedEntitlements()
     {
         try {
-            return app(\Core\Mod\Tenant\Services\EntitlementService::class)
+            return app(\Core\Core\Tenant\Services\EntitlementService::class)
                 ->getUsageSummary($this->workspace);
         } catch (\Exception $e) {
             return collect();
@@ -431,7 +431,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        $package = \Core\Mod\Tenant\Models\Package::findOrFail($this->selectedPackageId);
+        $package = \Core\Core\Tenant\Models\Package::findOrFail($this->selectedPackageId);
 
         // Check if already assigned
         $existing = $this->workspace->workspacePackages()
@@ -446,7 +446,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        \Core\Mod\Tenant\Models\WorkspacePackage::create([
+        \Core\Core\Tenant\Models\WorkspacePackage::create([
             'workspace_id' => $this->workspace->id,
             'package_id' => $package->id,
             'status' => 'active',
@@ -461,7 +461,7 @@ class WorkspaceDetails extends Component
 
     public function removePackage(int $workspacePackageId): void
     {
-        $wp = \Core\Mod\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = \Core\Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $packageName = $wp->package?->name ?? 'Package';
@@ -474,7 +474,7 @@ class WorkspaceDetails extends Component
 
     public function suspendPackage(int $workspacePackageId): void
     {
-        $wp = \Core\Mod\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = \Core\Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $wp->suspend();
@@ -486,7 +486,7 @@ class WorkspaceDetails extends Component
 
     public function reactivatePackage(int $workspacePackageId): void
     {
-        $wp = \Core\Mod\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = \Core\Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $wp->reactivate();
@@ -523,7 +523,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        $feature = \Core\Mod\Tenant\Models\Feature::where('code', $this->selectedFeatureCode)->first();
+        $feature = \Core\Core\Tenant\Models\Feature::where('code', $this->selectedFeatureCode)->first();
 
         if (! $feature) {
             $this->actionMessage = 'Feature not found.';
@@ -534,24 +534,24 @@ class WorkspaceDetails extends Component
 
         // Map type to boost type constant
         $boostType = match ($this->entitlementType) {
-            'enable' => \Core\Mod\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
-            'add_limit' => \Core\Mod\Tenant\Models\Boost::BOOST_TYPE_ADD_LIMIT,
-            'unlimited' => \Core\Mod\Tenant\Models\Boost::BOOST_TYPE_UNLIMITED,
-            default => \Core\Mod\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
+            'enable' => \Core\Core\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
+            'add_limit' => \Core\Core\Tenant\Models\Boost::BOOST_TYPE_ADD_LIMIT,
+            'unlimited' => \Core\Core\Tenant\Models\Boost::BOOST_TYPE_UNLIMITED,
+            default => \Core\Core\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
         };
 
         $durationType = $this->entitlementDuration === 'permanent'
-            ? \Core\Mod\Tenant\Models\Boost::DURATION_PERMANENT
-            : \Core\Mod\Tenant\Models\Boost::DURATION_DURATION;
+            ? \Core\Core\Tenant\Models\Boost::DURATION_PERMANENT
+            : \Core\Core\Tenant\Models\Boost::DURATION_DURATION;
 
-        \Core\Mod\Tenant\Models\Boost::create([
+        \Core\Core\Tenant\Models\Boost::create([
             'workspace_id' => $this->workspace->id,
             'feature_code' => $this->selectedFeatureCode,
             'boost_type' => $boostType,
             'duration_type' => $durationType,
             'limit_value' => $this->entitlementType === 'add_limit' ? $this->entitlementLimit : null,
             'consumed_quantity' => 0,
-            'status' => \Core\Mod\Tenant\Models\Boost::STATUS_ACTIVE,
+            'status' => \Core\Core\Tenant\Models\Boost::STATUS_ACTIVE,
             'starts_at' => now(),
             'expires_at' => $this->entitlementExpiresAt ? \Carbon\Carbon::parse($this->entitlementExpiresAt) : null,
             'metadata' => ['granted_by' => auth()->id(), 'granted_at' => now()->toDateTimeString()],
@@ -565,7 +565,7 @@ class WorkspaceDetails extends Component
 
     public function removeBoost(int $boostId): void
     {
-        $boost = \Core\Mod\Tenant\Models\Boost::where('workspace_id', $this->workspace->id)
+        $boost = \Core\Core\Tenant\Models\Boost::where('workspace_id', $this->workspace->id)
             ->findOrFail($boostId);
 
         $featureCode = $boost->feature_code;

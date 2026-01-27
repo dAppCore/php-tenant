@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Events\Webhook;
+namespace Core\Core\Tenant\Events\Webhook;
 
-use Core\Mod\Tenant\Contracts\EntitlementWebhookEvent;
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Contracts\EntitlementWebhookEvent;
+use Core\Core\Tenant\Models\Feature;
+use Core\Core\Tenant\Models\Workspace;
 
 /**
  * Event fired when workspace usage reaches 100% of the limit.

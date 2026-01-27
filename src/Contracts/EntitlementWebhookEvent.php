@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Contracts;
+namespace Core\Core\Tenant\Contracts;
 
 /**
  * Contract for entitlement webhook events.

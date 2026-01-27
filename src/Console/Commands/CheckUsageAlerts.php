@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Console\Commands;
+namespace Core\Core\Tenant\Console\Commands;
 
-use Core\Mod\Tenant\Models\Workspace;
-use Core\Mod\Tenant\Services\UsageAlertService;
+use Core\Core\Tenant\Models\Workspace;
+use Core\Core\Tenant\Services\UsageAlertService;
 use Illuminate\Console\Command;
 
 /**

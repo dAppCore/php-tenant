@@ -8,9 +8,9 @@ declare(strict_types=1);
  * Account management and workspace routes.
  */
 
-use Core\Mod\Tenant\View\Modal\Web\CancelDeletion;
-use Core\Mod\Tenant\View\Modal\Web\ConfirmDeletion;
-use Core\Mod\Tenant\View\Modal\Web\WorkspaceHome;
+use Core\Core\Tenant\View\Modal\Web\CancelDeletion;
+use Core\Core\Tenant\View\Modal\Web\ConfirmDeletion;
+use Core\Core\Tenant\View\Modal\Web\WorkspaceHome;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,7 +41,7 @@ Route::prefix('account')->name('account.')->group(function () {
 |
 */
 
-Route::get('/workspace/invitation/{token}', \Core\Mod\Tenant\Controllers\WorkspaceInvitationController::class)
+Route::get('/workspace/invitation/{token}', \Core\Core\Tenant\Controllers\WorkspaceInvitationController::class)
     ->name('workspace.invitation.accept');
 
 /*

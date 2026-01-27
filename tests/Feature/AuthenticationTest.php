@@ -1,8 +1,8 @@
 <?php
 
-namespace Core\Mod\Tenant\Tests\Feature;
+namespace Core\Core\Tenant\Tests\Feature;
 
-use Core\Mod\Tenant\Models\User;
+use Core\Core\Tenant\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\Mod\Tenant\Notifications;
+namespace Core\Core\Tenant\Notifications;
 
-use Core\Mod\Tenant\Models\Feature;
-use Core\Mod\Tenant\Models\UsageAlertHistory;
-use Core\Mod\Tenant\Models\Workspace;
+use Core\Core\Tenant\Models\Feature;
+use Core\Core\Tenant\Models\UsageAlertHistory;
+use Core\Core\Tenant\Models\Workspace;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
