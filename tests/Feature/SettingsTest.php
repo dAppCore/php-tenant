@@ -1,10 +1,10 @@
 <?php
 
-namespace Core\Core\Tenant\Tests\Feature;
+namespace Core\Mod\Tenant\Tests\Feature;
 
 use Core\Mod\Hub\View\Modal\Admin\Settings;
 use Core\Mod\Social\Models\Setting;
-use Core\Core\Tenant\Models\User;
+use Core\Mod\Tenant\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;

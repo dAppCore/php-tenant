@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Core\Core\Tenant\Models\WaitlistEntry;
-use Core\Core\Tenant\Notifications\WaitlistInviteNotification;
+use Core\Mod\Tenant\Models\WaitlistEntry;
+use Core\Mod\Tenant\Notifications\WaitlistInviteNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;

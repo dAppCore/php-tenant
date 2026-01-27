@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Core\Core\Tenant\Tests\Feature;
+namespace Core\Mod\Tenant\Tests\Feature;
 
-use Core\Core\Tenant\Models\User;
-use Core\Core\Tenant\Models\Workspace;
-use Core\Core\Tenant\Models\WorkspaceInvitation;
-use Core\Core\Tenant\Notifications\WorkspaceInvitationNotification;
+use Core\Mod\Tenant\Models\User;
+use Core\Mod\Tenant\Models\Workspace;
+use Core\Mod\Tenant\Models\WorkspaceInvitation;
+use Core\Mod\Tenant\Notifications\WorkspaceInvitationNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;

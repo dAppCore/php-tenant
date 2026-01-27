@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Core\Core\Tenant\Models\User;
-use Core\Core\Tenant\Models\UserToken;
+use Core\Mod\Tenant\Models\User;
+use Core\Mod\Tenant\Models\UserToken;
 
 test('can authenticate with valid bearer token', function () {
     $user = User::factory()->create();

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Core\Core\Tenant\Tests\Feature;
+namespace Core\Mod\Tenant\Tests\Feature;
 
 use Core\Mod\Social\Models\Account;
-use Core\Core\Tenant\Concerns\BelongsToWorkspace;
-use Core\Core\Tenant\Exceptions\MissingWorkspaceContextException;
-use Core\Core\Tenant\Middleware\RequireWorkspaceContext;
-use Core\Core\Tenant\Models\User;
-use Core\Core\Tenant\Models\Workspace;
-use Core\Core\Tenant\Scopes\WorkspaceScope;
+use Core\Mod\Tenant\Concerns\BelongsToWorkspace;
+use Core\Mod\Tenant\Exceptions\MissingWorkspaceContextException;
+use Core\Mod\Tenant\Middleware\RequireWorkspaceContext;
+use Core\Mod\Tenant\Models\User;
+use Core\Mod\Tenant\Models\Workspace;
+use Core\Mod\Tenant\Scopes\WorkspaceScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;

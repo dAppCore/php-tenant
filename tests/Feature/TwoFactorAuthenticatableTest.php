@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Core\Core\Tenant\Models\User;
-use Core\Core\Tenant\Models\UserTwoFactorAuth;
+use Core\Mod\Tenant\Models\User;
+use Core\Mod\Tenant\Models\UserTwoFactorAuth;
 use Illuminate\Support\Facades\Cache;
 
 beforeEach(function () {

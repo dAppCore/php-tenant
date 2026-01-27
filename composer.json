@@ -18,18 +18,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Core\\Tenant\\": ""
+            "Core\\Mod\\Tenant\\": ""
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Core\\Tenant\\Tests\\": "Tests/"
+            "Core\\Mod\\Tenant\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Core\\Tenant\\Boot"
+                "Core\\Mod\\Tenant\\Boot"
             ]
         }
     },

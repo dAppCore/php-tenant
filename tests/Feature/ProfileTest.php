@@ -1,9 +1,9 @@
 <?php
 
-namespace Core\Core\Tenant\Tests\Feature;
+namespace Core\Mod\Tenant\Tests\Feature;
 
 use Core\Mod\Hub\View\Modal\Admin\Profile;
-use Core\Core\Tenant\Models\User;
+use Core\Mod\Tenant\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;

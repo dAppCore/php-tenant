@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Core\Core\Tenant\Jobs\ProcessAccountDeletion;
-use Core\Core\Tenant\Models\AccountDeletionRequest;
-use Core\Core\Tenant\Models\User;
-use Core\Core\Tenant\Models\Workspace;
+use Core\Mod\Tenant\Jobs\ProcessAccountDeletion;
+use Core\Mod\Tenant\Models\AccountDeletionRequest;
+use Core\Mod\Tenant\Models\User;
+use Core\Mod\Tenant\Models\Workspace;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 
