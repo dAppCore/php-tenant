@@ -132,8 +132,14 @@ class Boot extends ServiceProvider
     {
         $event->views($this->moduleName, __DIR__.'/View/Blade');
 
+        if (file_exists(__DIR__.'/Routes/admin.php')) {
+            $event->routes(fn () => require __DIR__.'/Routes/admin.php');
+        }
+
         // Admin Livewire components
         $event->livewire('tenant.admin.entitlement-webhook-manager', View\Modal\Admin\EntitlementWebhookManager::class);
+        $event->livewire('tenant.admin.team-manager', View\Modal\Admin\TeamManager::class);
+        $event->livewire('tenant.admin.member-manager', View\Modal\Admin\MemberManager::class);
     }
 
     public function onApiRoutes(ApiRoutesRegistering $event): void
