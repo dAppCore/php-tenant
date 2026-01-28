@@ -1,51 +1,25 @@
-# Core Tenant
+# CLAUDE.md
 
-Multi-tenancy module for Core PHP Framework.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Quick Reference
+## Commands
 
 ```bash
-composer test                 # Run tests
-composer pint                 # Fix code style
+composer test                    # Run all tests
+composer lint                    # Fix code style (Pint)
+vendor/bin/pest tests/Feature/AuthenticationTest.php  # Run single test
+vendor/bin/pint --dirty          # Format changed files only
 ```
+
+## Namespace
+
+All classes use `Core\Tenant\` namespace (PSR-4 autoloaded from root).
 
 ## Architecture
 
-This module provides the multi-tenancy foundation:
+Multi-tenancy module for Core PHP Framework using event-driven lazy loading.
 
-- **Users** - Application users with 2FA support
-- **Workspaces** - Tenant boundaries with team members
-- **Entitlements** - Feature access, packages, usage tracking
-- **Account Management** - Settings, scheduled deletions
-
-### Key Services
-
-| Service | Purpose |
-|---------|---------|
-| `WorkspaceManager` | Current workspace context |
-| `WorkspaceService` | Workspace CRUD operations |
-| `EntitlementService` | Feature access & usage |
-| `UserStatsService` | User statistics |
-| `UsageAlertService` | Usage threshold alerts |
-
-### Models
-
-```
-src/Models/
-├── User.php              # Application user
-├── Workspace.php         # Tenant workspace
-├── WorkspaceMember.php   # Membership with roles
-├── Entitlement.php       # Feature entitlements
-├── UsageRecord.php       # Usage tracking
-└── Referral.php          # Referral tracking
-```
-
-### Middleware
-
-- `RequireAdminDomain` - Restrict to admin domain
-- `CheckWorkspacePermission` - Permission-based access
-
-## Event Listeners
+### Module Registration (Boot.php)
 
 ```php
 public static array $listens = [
@@ -56,18 +30,50 @@ public static array $listens = [
 ];
 ```
 
-## Namespace
+Routes, views, commands, and Livewire components register only when their events fire.
 
-All classes use `Core\Mod\Tenant\` namespace.
+### Key Services (Singletons)
+
+| Service | Purpose |
+|---------|---------|
+| `WorkspaceManager` | Current workspace context |
+| `WorkspaceService` | Workspace CRUD, session switching |
+| `EntitlementService` | Feature access, package limits, usage |
+| `EntitlementWebhookService` | Webhook delivery with circuit breaker |
+| `WorkspaceCacheManager` | Workspace-scoped caching with tags |
+| `UsageAlertService` | Usage threshold alerts |
+| `TotpService` | 2FA TOTP generation/validation |
+
+### Workspace Isolation
+
+The `BelongsToWorkspace` trait enforces tenancy:
+- Auto-assigns `workspace_id` on create
+- Throws `MissingWorkspaceContextException` if no workspace context
+- Provides `forWorkspaceCached()` and `ownedByCurrentWorkspaceCached()` query methods
+- Auto-invalidates workspace cache on model save/delete
+
+### Entitlement System
+
+Features have types: `boolean`, `limit`, `unlimited`. Usage is tracked via `UsageRecord` with rolling window or monthly resets. Packages bundle features. Boosts provide temporary limit increases.
+
+## Coding Standards
+
+- **UK English**: colour, organisation, centre (not American spellings)
+- **Strict types**: `declare(strict_types=1);` in every file
+- **Type hints**: All parameters and return types
+- **Pest**: Write tests using Pest, not PHPUnit syntax
+- **Flux Pro**: Use Flux components, not vanilla Alpine
+- **Font Awesome**: Use FA icons, not Heroicons
 
 ## Testing
 
-Tests use Orchestra Testbench. Run with:
+Uses Pest with Orchestra Testbench. Tests are in `tests/Feature/`.
 
-```bash
-composer test
+```php
+it('displays the workspace home', function () {
+    $workspace = Workspace::factory()->create();
+
+    $this->get("/workspace/{$workspace->uuid}")
+        ->assertOk();
+});
 ```
-
-## License
-
-EUPL-1.2 (copyleft, GPL-compatible).
