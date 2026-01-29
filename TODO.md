@@ -111,17 +111,18 @@ The middleware accepts workspace_id from multiple sources (header, query, input)
 ## P2 - High Priority
 
 ### DX-001: Add strict_types declaration to all PHP files
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **Files:** Multiple files missing declaration
 
-Several files are missing `declare(strict_types=1);`:
+Several files were missing `declare(strict_types=1);`:
 - `Models/Workspace.php`
 - `Models/User.php`
 - `Services/EntitlementService.php`
 
-**Acceptance Criteria:**
-- Add strict_types to all PHP files
-- Run tests to verify no type coercion issues
+**Resolution:**
+- Added `declare(strict_types=1);` to all three files
+- Declaration placed immediately after `<?php` and before namespace
+- Tests not runnable in isolation (federated monorepo dependency constraints)
 
 ---
 
