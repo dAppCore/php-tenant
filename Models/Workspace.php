@@ -660,27 +660,38 @@ class Workspace extends Model
             ->first();
 
         if ($existing) {
-            // Update existing invitation
+            // Update existing invitation (keep existing hashed token)
             $existing->update([
                 'role' => $role,
                 'invited_by' => $invitedBy?->id,
                 'expires_at' => now()->addDays($expiresInDays),
             ]);
 
+            // For re-sends, we need to generate a new token since we can't retrieve the old plaintext
+            $plaintextToken = WorkspaceInvitation::generateToken();
+            $existing->token = $plaintextToken;
+            $existing->save();
+
+            // Send notification with the new plaintext token
+            $existing->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($existing, $plaintextToken));
+
             return $existing;
         }
 
-        // Create new invitation
+        // Generate plaintext token (will be hashed on save via model boot)
+        $plaintextToken = WorkspaceInvitation::generateToken();
+
+        // Create new invitation (token gets hashed in the creating event)
         $invitation = $this->invitations()->create([
             'email' => $email,
-            'token' => WorkspaceInvitation::generateToken(),
+            'token' => $plaintextToken,
             'role' => $role,
             'invited_by' => $invitedBy?->id,
             'expires_at' => now()->addDays($expiresInDays),
         ]);
 
-        // Send notification
-        $invitation->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($invitation));
+        // Send notification with the plaintext token (not the hashed one)
+        $invitation->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($invitation, $plaintextToken));
 
         return $invitation;
     }

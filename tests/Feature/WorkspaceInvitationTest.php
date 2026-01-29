@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Tests\Feature;
 
+use Core\Tenant\Database\Factories\WorkspaceInvitationFactory;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspaceInvitation;
 use Core\Tenant\Notifications\WorkspaceInvitationNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -33,12 +35,26 @@ class WorkspaceInvitationTest extends TestCase
             'invited_by' => $owner->id,
         ]);
 
+        // Token should be hashed (starts with $2y$)
         $this->assertNotNull($invitation->token);
+        $this->assertTrue(str_starts_with($invitation->token, '$2y$'));
         $this->assertTrue($invitation->isPending());
         $this->assertFalse($invitation->isExpired());
         $this->assertFalse($invitation->isAccepted());
 
         Notification::assertSentTo($invitation, WorkspaceInvitationNotification::class);
+    }
+
+    public function test_invitation_token_is_hashed(): void
+    {
+        Notification::fake();
+
+        $workspace = Workspace::factory()->create();
+        $invitation = $workspace->invite('test@example.com', 'member');
+
+        // Token should be hashed (bcrypt format)
+        $this->assertTrue(str_starts_with($invitation->token, '$2y$'));
+        $this->assertEquals(60, strlen($invitation->token));
     }
 
     public function test_invitation_expires_after_set_days(): void
@@ -115,7 +131,8 @@ class WorkspaceInvitationTest extends TestCase
         $second = $workspace->invite('test@example.com', 'admin', $owner);
 
         $this->assertEquals($first->id, $second->id);
-        $this->assertEquals($firstToken, $second->token); // Token unchanged
+        // Token should change when re-inviting (new token generated and hashed)
+        $this->assertNotEquals($firstToken, $second->fresh()->token);
         $this->assertEquals('admin', $second->role);
 
         // Should only have one invitation
@@ -127,15 +144,61 @@ class WorkspaceInvitationTest extends TestCase
         $workspace = Workspace::factory()->create();
         $user = User::factory()->create();
 
-        $invitation = WorkspaceInvitation::factory()->create([
-            'workspace_id' => $workspace->id,
-            'role' => 'member',
-        ]);
+        // Use a known plaintext token
+        $plaintextToken = 'test-plaintext-token-for-acceptance-testing-1234567890';
 
-        $result = Workspace::acceptInvitation($invitation->token, $user);
+        $invitation = WorkspaceInvitation::factory()
+            ->withPlaintextToken($plaintextToken)
+            ->create([
+                'workspace_id' => $workspace->id,
+                'role' => 'member',
+            ]);
+
+        // Accept using the plaintext token (model stores hashed version)
+        $result = Workspace::acceptInvitation($plaintextToken, $user);
 
         $this->assertTrue($result);
         $this->assertTrue($workspace->users()->where('user_id', $user->id)->exists());
+    }
+
+    public function test_find_by_token_uses_hash_check(): void
+    {
+        $workspace = Workspace::factory()->create();
+
+        $plaintextToken = 'my-secret-plaintext-token-for-testing-hash-lookup';
+
+        $invitation = WorkspaceInvitation::factory()
+            ->withPlaintextToken($plaintextToken)
+            ->create([
+                'workspace_id' => $workspace->id,
+            ]);
+
+        // findByToken should find the invitation using the plaintext token
+        $found = WorkspaceInvitation::findByToken($plaintextToken);
+
+        $this->assertNotNull($found);
+        $this->assertEquals($invitation->id, $found->id);
+
+        // Token in database should be hashed
+        $this->assertTrue(str_starts_with($found->token, '$2y$'));
+
+        // Hash::check should verify the plaintext against the stored hash
+        $this->assertTrue(Hash::check($plaintextToken, $found->token));
+    }
+
+    public function test_verify_token_method(): void
+    {
+        $workspace = Workspace::factory()->create();
+        $plaintextToken = 'plaintext-token-for-verify-method-test';
+
+        $invitation = WorkspaceInvitation::factory()
+            ->withPlaintextToken($plaintextToken)
+            ->create([
+                'workspace_id' => $workspace->id,
+            ]);
+
+        $this->assertTrue($invitation->verifyToken($plaintextToken));
+        $this->assertFalse($invitation->verifyToken('wrong-token'));
     }
 
     public function test_static_accept_with_invalid_token_returns_false(): void

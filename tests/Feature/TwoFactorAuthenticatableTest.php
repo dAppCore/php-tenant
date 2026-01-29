@@ -331,4 +331,72 @@ describe('UserTwoFactorAuth Model', function () {
 
         expect($twoFactorAuth->confirmed_at)->toBeInstanceOf(\Carbon\Carbon::class);
     });
+
+    it('encrypts secret at rest', function () {
+        $secretKey = 'JBSWY3DPEHPK3PXP';
+
+        $twoFactorAuth = UserTwoFactorAuth::create([
+            'user_id' => $this->user->id,
+            'secret_key' => $secretKey,
+            'recovery_codes' => [],
+        ]);
+
+        // The model should return the decrypted value (via secret_key accessor)
+        expect($twoFactorAuth->secret_key)->toBe($secretKey);
+        // Also accessible via the actual column name
+        expect($twoFactorAuth->secret)->toBe($secretKey);
+
+        // But the raw database value should be encrypted (base64 JSON with iv, value, mac)
+        // Note: DB column is 'secret', not 'secret_key'
+        $rawValue = \Illuminate\Support\Facades\DB::table('user_two_factor_auth')
+            ->where('id', $twoFactorAuth->id)
+            ->value('secret');
+
+        // Raw value should not equal the plaintext
+        expect($rawValue)->not->toBe($secretKey);
+
+        // Raw value should look like Laravel encrypted data (starts with eyJ for base64 JSON)
+        expect($rawValue)->toStartWith('eyJ');
+    });
+
+    it('encrypts recovery_codes at rest', function () {
+        $codes = ['CODE1-CODE1', 'CODE2-CODE2'];
+
+        $twoFactorAuth = UserTwoFactorAuth::create([
+            'user_id' => $this->user->id,
+            'secret_key' => 'JBSWY3DPEHPK3PXP',
+            'recovery_codes' => $codes,
+        ]);
+
+        // The model should return the decrypted collection
+        expect($twoFactorAuth->recovery_codes->toArray())->toBe($codes);
+
+        // But the raw database value should be encrypted
+        $rawValue = \Illuminate\Support\Facades\DB::table('user_two_factor_auth')
+            ->where('id', $twoFactorAuth->id)
+            ->value('recovery_codes');
+
+        // Raw value should not contain the plaintext codes
+        expect($rawValue)->not->toContain('CODE1');
+
+        // Raw value should look like Laravel encrypted data
+        expect($rawValue)->toStartWith('eyJ');
+    });
+
+    it('can decrypt and use encrypted secret for TOTP verification', function () {
+        $secretKey = 'JBSWY3DPEHPK3PXP';
+
+        UserTwoFactorAuth::create([
+            'user_id' => $this->user->id,
+            'secret_key' => $secretKey,
+            'recovery_codes' => [],
+            'confirmed_at' => now(),
+        ]);
+
+        $this->user->refresh();
+
+        // The secret should be usable for verification
+        // (verifyTwoFactorCode uses the secret internally)
+        expect($this->user->twoFactorAuthSecretKey())->toBe($secretKey);
+    });
 });

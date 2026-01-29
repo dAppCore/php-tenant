@@ -14,8 +14,15 @@ class WorkspaceInvitationNotification extends Notification implements ShouldQueu
 {
     use Queueable;
 
+    /**
+     * Create a new notification instance.
+     *
+     * @param  WorkspaceInvitation  $invitation  The invitation model
+     * @param  string  $plaintextToken  The plaintext token for the URL (tokens are hashed in DB)
+     */
     public function __construct(
-        protected WorkspaceInvitation $invitation
+        protected WorkspaceInvitation $invitation,
+        protected string $plaintextToken
     ) {}
 
     /**
@@ -33,7 +40,8 @@ class WorkspaceInvitationNotification extends Notification implements ShouldQueu
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $acceptUrl = route('workspace.invitation.accept', ['token' => $this->invitation->token]);
+        // Use the plaintext token for the URL (not the hashed one from the DB)
+        $acceptUrl = route('workspace.invitation.accept', ['token' => $this->plaintextToken]);
         $workspaceName = $this->invitation->workspace->name;
         $inviterName = $this->invitation->inviter?->name ?? 'A team member';
         $roleName = ucfirst($this->invitation->role);

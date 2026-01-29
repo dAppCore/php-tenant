@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class WorkspaceInvitation extends Model
@@ -34,6 +35,22 @@ class WorkspaceInvitation extends Model
         'expires_at' => 'datetime',
         'accepted_at' => 'datetime',
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * Automatically hashes tokens when creating invitations.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (WorkspaceInvitation $invitation) {
+            // Only hash if the token looks like a plaintext token (not already hashed)
+            // Bcrypt hashes start with $2y$ and are 60 chars
+            if ($invitation->token && ! str_starts_with($invitation->token, '$2y$')) {
+                $invitation->token = Hash::make($invitation->token);
+            }
+        });
+    }
 
     /**
      * Get the workspace this invitation is for.
@@ -103,30 +120,65 @@ class WorkspaceInvitation extends Model
 
     /**
      * Generate a unique token for this invitation.
+     *
+     * Returns the plaintext token. The token will be hashed when stored.
      */
     public static function generateToken(): string
     {
-        do {
-            $token = Str::random(64);
-        } while (static::where('token', $token)->exists());
-
-        return $token;
+        // Generate a cryptographically secure random token
+        // No need to check for uniqueness since hashed tokens are unique
+        return Str::random(64);
     }
 
     /**
      * Find invitation by token.
+     *
+     * Since tokens are hashed, we must check each pending/valid invitation
+     * against the provided plaintext token using Hash::check().
      */
     public static function findByToken(string $token): ?self
     {
-        return static::where('token', $token)->first();
+        // Get all invitations and check the hash
+        // We limit to recent invitations to improve performance
+        $invitations = static::orderByDesc('created_at')
+            ->limit(1000)
+            ->get();
+
+        foreach ($invitations as $invitation) {
+            if (Hash::check($token, $invitation->token)) {
+                return $invitation;
+            }
+        }
+
+        return null;
     }
 
     /**
      * Find pending invitation by token.
+     *
+     * Since tokens are hashed, we must check each pending invitation
+     * against the provided plaintext token using Hash::check().
      */
     public static function findPendingByToken(string $token): ?self
     {
-        return static::where('token', $token)->pending()->first();
+        // Get pending invitations and check the hash
+        $invitations = static::pending()->get();
+
+        foreach ($invitations as $invitation) {
+            if (Hash::check($token, $invitation->token)) {
+                return $invitation;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verify if the given plaintext token matches this invitation's hashed token.
+     */
+    public function verifyToken(string $plaintextToken): bool
+    {
+        return Hash::check($plaintextToken, $this->token);
     }
 
     /**

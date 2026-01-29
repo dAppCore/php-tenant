@@ -6,6 +6,7 @@ namespace Core\Tenant\Database\Factories;
 
 use Core\Tenant\Models\WorkspaceInvitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -16,20 +17,45 @@ class WorkspaceInvitationFactory extends Factory
     protected $model = WorkspaceInvitation::class;
 
     /**
+     * The plaintext token for the last created invitation.
+     *
+     * Since tokens are hashed, tests may need access to the original plaintext.
+     */
+    public static ?string $lastPlaintextToken = null;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        // Store the plaintext token so tests can access it if needed
+        static::$lastPlaintextToken = Str::random(64);
+
         return [
             'email' => fake()->unique()->safeEmail(),
-            'token' => Str::random(64),
+            // Token will be hashed by the model's creating event
+            'token' => static::$lastPlaintextToken,
             'role' => 'member',
             'invited_by' => null,
             'expires_at' => now()->addDays(7),
             'accepted_at' => null,
         ];
+    }
+
+    /**
+     * Create a factory with a specific plaintext token.
+     *
+     * Useful for tests that need to know the token before creation.
+     */
+    public function withPlaintextToken(string $token): static
+    {
+        static::$lastPlaintextToken = $token;
+
+        return $this->state(fn (array $attributes) => [
+            'token' => $token,
+        ]);
     }
 
     /**
