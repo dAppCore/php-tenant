@@ -167,7 +167,7 @@ The test file covers workspace-level entitlements but not namespace-level (`canF
 ---
 
 ### TEST-002: Add integration tests for EntitlementApiController
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `tests/Feature/EntitlementApiTest.php`
 
 Need HTTP-level integration tests for the API endpoints, including authentication, validation, and error cases.
@@ -177,6 +177,23 @@ Need HTTP-level integration tests for the API endpoints, including authenticatio
 - Test validation error responses
 - Test authentication failures
 - Test rate limiting (once implemented)
+
+**Resolution:**
+- Added comprehensive integration tests for EntitlementApiController
+- Cross-App Entitlement API tests:
+  - `GET /api/v1/entitlements/check` - authentication, validation (email, feature, quantity), 404 responses, entitlement checks
+  - `POST /api/v1/entitlements/usage` - authentication, validation, recording usage with metadata
+  - `GET /api/v1/entitlements/summary` - authentication, workspace summary with packages, features, boosts
+- Blesta Provisioning API tests:
+  - `POST /api/provisioning/entitlements` (store) - authentication, validation (email, name, product_code, dates), user creation, workspace creation, package provisioning
+  - `GET /api/provisioning/entitlements/{id}` (show) - authentication, 404 handling, entitlement details with ISO8601 dates
+  - `POST /api/provisioning/entitlements/{id}/suspend` - authentication, 404 handling, suspension with reason, log entry creation
+  - `POST /api/provisioning/entitlements/{id}/unsuspend` - authentication, 404 handling, reactivation, access restoration
+  - `POST /api/provisioning/entitlements/{id}/cancel` - authentication, 404 handling, cancellation with reason, access denial
+  - `POST /api/provisioning/entitlements/{id}/renew` - authentication, validation, date updates, log entry creation
+- Error response format tests for consistency across endpoints
+- Rate limiting tests verifying the `#[RateLimit]` attribute configuration (60 requests/minute)
+- All tests use Pest syntax with `declare(strict_types=1)`
 
 ---
 
