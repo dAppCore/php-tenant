@@ -188,17 +188,25 @@ The `invalidateCache()` method iterates all features and clears each key individ
 ---
 
 ### PERF-002: Add database indexes for common queries
-**Status:** Open
-**File:** `Migrations/0001_01_01_000000_create_tenant_tables.php`
+**Status:** Fixed (2026-01-29)
+**File:** `Migrations/2026_01_29_000000_add_performance_indexes.php`
 
 Missing indexes identified:
 - `users.tier` (for tier-based queries)
 - `namespaces.slug` (currently only unique in combination)
 - `entitlement_usage_records.user_id`
 
-**Acceptance Criteria:**
-- Create migration adding missing indexes
-- Verify query plan improvements with EXPLAIN
+**Resolution:**
+- Created migration `2026_01_29_000000_add_performance_indexes.php` adding:
+  - `users.tier` - for tier-based queries (getTier(), isPaid(), etc.)
+  - `namespaces.slug` - for slug lookups independent of owner
+  - `entitlement_usage_records.user_id` - foreign key index
+  - `workspaces.is_active` - for active() scope queries
+  - `workspaces.type` - for type filtering
+  - `workspaces.domain` - for domain lookups
+  - `user_workspace.team_id` - foreign key from teams migration
+  - `entitlement_logs.user_id` - foreign key index
+- All indexes use explicit names for reliable rollback
 
 ---
 
