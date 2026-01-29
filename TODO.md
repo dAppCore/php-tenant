@@ -147,16 +147,22 @@ The EntitlementService is the core API for entitlement checks but lacks comprehe
 ---
 
 ### TEST-001: Add tests for namespace-level entitlements
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `tests/Feature/EntitlementServiceTest.php`
 
 The test file covers workspace-level entitlements but not namespace-level (`canForNamespace`, `recordNamespaceUsage`, etc.).
 
-**Acceptance Criteria:**
-- Test `canForNamespace()` with various ownership scenarios
-- Test entitlement cascade (namespace -> workspace -> user tier)
-- Test `provisionNamespacePackage()` and `provisionNamespaceBoost()`
-- Test namespace cache invalidation
+**Resolution:**
+- Added comprehensive test suite for namespace-level entitlements
+- Tests `canForNamespace()` with user-owned and workspace-owned namespaces
+- Tests entitlement cascade (namespace -> workspace -> user tier) with various scenarios
+- Tests `provisionNamespacePackage()` including package replacement, expiry, and metadata
+- Tests `provisionNamespaceBoost()` including stacking, unlimited boosts, and expiry
+- Tests `recordNamespaceUsage()` with metadata and workspace context
+- Tests `getNamespaceUsageSummary()` with usage percentages and near-limit detection
+- Tests `invalidateNamespaceCache()` for both limits and usage
+- Tests multiple namespaces with different entitlements and usage tracking
+- Tests boost stacking behaviour including unlimited override
 
 ---
 
