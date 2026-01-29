@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Services;
 
+use Core\Tenant\Events\EntitlementCacheInvalidated;
 use Core\Tenant\Models\Boost;
 use Core\Tenant\Models\EntitlementLog;
 use Core\Tenant\Models\Feature;
@@ -14,6 +15,7 @@ use Core\Tenant\Models\UsageRecord;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspacePackage;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -89,6 +91,92 @@ class EntitlementService
      * Usage data uses a shorter 60-second cache.
      */
     protected const CACHE_TTL = 300; // 5 minutes
+
+    /**
+     * Cache TTL in seconds for usage data.
+     *
+     * Usage data is more volatile and uses a shorter cache duration.
+     */
+    protected const USAGE_CACHE_TTL = 60;
+
+    /**
+     * Cache tag prefix for workspace entitlements.
+     */
+    protected const CACHE_TAG_WORKSPACE = 'entitlement:ws';
+
+    /**
+     * Cache tag prefix for namespace entitlements.
+     */
+    protected const CACHE_TAG_NAMESPACE = 'entitlement:ns';
+
+    /**
+     * Cache tag for limit data.
+     */
+    protected const CACHE_TAG_LIMITS = 'entitlement:limits';
+
+    /**
+     * Cache tag for usage data.
+     */
+    protected const CACHE_TAG_USAGE = 'entitlement:usage';
+
+    /**
+     * Check if the cache store supports tags.
+     *
+     * Cache tags enable O(1) invalidation instead of O(n) where n = feature count.
+     * Supported by Redis and Memcached drivers.
+     */
+    protected function supportsCacheTags(): bool
+    {
+        try {
+            return Cache::getStore() instanceof TaggableStore;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Get cache tags for workspace entitlements.
+     *
+     * @param Workspace $workspace The workspace
+     * @param string $type The cache type ('limit' or 'usage')
+     * @return array<string> Cache tags
+     */
+    protected function getWorkspaceCacheTags(Workspace $workspace, string $type = 'limit'): array
+    {
+        $tags = [
+            self::CACHE_TAG_WORKSPACE.':'.$workspace->id,
+        ];
+
+        if ($type === 'limit') {
+            $tags[] = self::CACHE_TAG_LIMITS;
+        } else {
+            $tags[] = self::CACHE_TAG_USAGE;
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Get cache tags for namespace entitlements.
+     *
+     * @param Namespace_ $namespace The namespace
+     * @param string $type The cache type ('limit' or 'usage')
+     * @return array<string> Cache tags
+     */
+    protected function getNamespaceCacheTags(Namespace_ $namespace, string $type = 'limit'): array
+    {
+        $tags = [
+            self::CACHE_TAG_NAMESPACE.':'.$namespace->id,
+        ];
+
+        if ($type === 'limit') {
+            $tags[] = self::CACHE_TAG_LIMITS;
+        } else {
+            $tags[] = self::CACHE_TAG_USAGE;
+        }
+
+        return $tags;
+    }
 
     /**
      * Check if a workspace can use a feature.
@@ -372,8 +460,8 @@ class EntitlementService
             'recorded_at' => now(),
         ]);
 
-        // Invalidate cache
-        $this->invalidateNamespaceCache($namespace);
+        // Invalidate only usage cache for this feature (granular invalidation)
+        $this->invalidateNamespaceUsageCache($namespace, $poolFeatureCode);
 
         return $record;
     }
@@ -439,8 +527,8 @@ class EntitlementService
             'recorded_at' => now(),
         ]);
 
-        // Invalidate cache
-        $this->invalidateCache($workspace);
+        // Invalidate only usage cache for this feature (granular invalidation)
+        $this->invalidateUsageCache($workspace, $poolFeatureCode);
 
         return $record;
     }
@@ -556,7 +644,10 @@ class EntitlementService
             newValues: $workspacePackage->toArray()
         );
 
-        $this->invalidateCache($workspace);
+        $this->invalidateCache(
+            $workspace,
+            reason: EntitlementCacheInvalidated::REASON_PACKAGE_PROVISIONED
+        );
 
         return $workspacePackage;
     }
@@ -660,7 +751,11 @@ class EntitlementService
             newValues: $boost->toArray()
         );
 
-        $this->invalidateCache($workspace);
+        $this->invalidateCache(
+            $workspace,
+            featureCodes: [$featureCode],
+            reason: EntitlementCacheInvalidated::REASON_BOOST_PROVISIONED
+        );
 
         return $boost;
     }
@@ -875,7 +970,10 @@ class EntitlementService
             );
         }
 
-        $this->invalidateCache($workspace);
+        $this->invalidateCache(
+            $workspace,
+            reason: EntitlementCacheInvalidated::REASON_PACKAGE_SUSPENDED
+        );
     }
 
     /**
@@ -923,7 +1021,10 @@ class EntitlementService
             );
         }
 
-        $this->invalidateCache($workspace);
+        $this->invalidateCache(
+            $workspace,
+            reason: EntitlementCacheInvalidated::REASON_PACKAGE_REACTIVATED
+        );
     }
 
     /**
@@ -987,7 +1088,10 @@ class EntitlementService
             metadata: ['reason' => 'Package revoked']
         );
 
-        $this->invalidateCache($workspace);
+        $this->invalidateCache(
+            $workspace,
+            reason: EntitlementCacheInvalidated::REASON_PACKAGE_REVOKED
+        );
     }
 
     /**
@@ -1008,8 +1112,7 @@ class EntitlementService
     protected function getTotalLimit(Workspace $workspace, string $featureCode): ?int
     {
         $cacheKey = "entitlement:{$workspace->id}:limit:{$featureCode}";
-
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($workspace, $featureCode) {
+        $callback = function () use ($workspace, $featureCode) {
             $feature = $this->getFeature($featureCode);
 
             if (! $feature) {
@@ -1065,7 +1168,15 @@ class EntitlementService
             }
 
             return $hasFeature ? $totalLimit : null;
-        });
+        };
+
+        // Use tagged cache if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            return Cache::tags($this->getWorkspaceCacheTags($workspace, 'limit'))
+                ->remember($cacheKey, self::CACHE_TTL, $callback);
+        }
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, $callback);
     }
 
     /**
@@ -1089,7 +1200,7 @@ class EntitlementService
     {
         $cacheKey = "entitlement:{$workspace->id}:usage:{$featureCode}";
 
-        return Cache::remember($cacheKey, 60, function () use ($workspace, $featureCode, $feature) {
+        $callback = function () use ($workspace, $featureCode, $feature) {
             // Determine the time window for usage calculation
             if ($feature->resetsMonthly()) {
                 // Get billing cycle anchor from the primary package
@@ -1113,7 +1224,15 @@ class EntitlementService
 
             // No reset - all time usage
             return UsageRecord::getTotalUsage($workspace->id, $featureCode);
-        });
+        };
+
+        // Use tagged cache if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            return Cache::tags($this->getWorkspaceCacheTags($workspace, 'usage'))
+                ->remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
+        }
+
+        return Cache::remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
     }
 
     /**
@@ -1140,6 +1259,11 @@ class EntitlementService
      * calculations on the next entitlement check. This is called automatically
      * when packages, boosts, or usage records change.
      *
+     * ## Performance
+     *
+     * When cache tags are supported (Redis, Memcached), this is an O(1) operation.
+     * For other cache drivers, falls back to O(n) iteration where n = feature count.
+     *
      * ## When Called Automatically
      *
      * - After `recordUsage()` or `recordNamespaceUsage()`
@@ -1160,19 +1284,138 @@ class EntitlementService
      * ```
      *
      * @param Workspace $workspace The workspace to invalidate caches for
+     * @param array<string> $featureCodes Specific features to invalidate (empty = all)
+     * @param string $reason The reason for invalidation (for event dispatch)
      */
-    public function invalidateCache(Workspace $workspace): void
-    {
-        // We can't easily clear pattern-based cache keys with all drivers,
-        // so we use a version tag approach
-        Cache::forget("entitlement:{$workspace->id}:version");
-        Cache::increment("entitlement:{$workspace->id}:version");
+    public function invalidateCache(
+        Workspace $workspace,
+        array $featureCodes = [],
+        string $reason = EntitlementCacheInvalidated::REASON_MANUAL
+    ): void {
+        // Use cache tags if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            $this->invalidateCacheWithTags($workspace, $featureCodes);
+        } else {
+            $this->invalidateCacheWithoutTags($workspace, $featureCodes);
+        }
 
-        // For now, just clear specific known keys
-        $features = Feature::pluck('code');
-        foreach ($features as $code) {
+        // Dispatch event for external listeners
+        EntitlementCacheInvalidated::dispatch(
+            $workspace,
+            null,
+            $featureCodes,
+            $reason
+        );
+    }
+
+    /**
+     * Invalidate cache using cache tags (O(1) operation).
+     *
+     * @param Workspace $workspace The workspace to invalidate
+     * @param array<string> $featureCodes Specific features (empty = all)
+     */
+    protected function invalidateCacheWithTags(Workspace $workspace, array $featureCodes = []): void
+    {
+        $workspaceTag = self::CACHE_TAG_WORKSPACE.':'.$workspace->id;
+
+        if (empty($featureCodes)) {
+            // Flush all cache for this workspace - O(1) with tags
+            Cache::tags([$workspaceTag])->flush();
+
+            return;
+        }
+
+        // Granular invalidation for specific features
+        foreach ($featureCodes as $featureCode) {
+            $limitKey = "entitlement:{$workspace->id}:limit:{$featureCode}";
+            $usageKey = "entitlement:{$workspace->id}:usage:{$featureCode}";
+
+            Cache::tags([$workspaceTag, self::CACHE_TAG_LIMITS])->forget($limitKey);
+            Cache::tags([$workspaceTag, self::CACHE_TAG_USAGE])->forget($usageKey);
+        }
+    }
+
+    /**
+     * Invalidate cache without tags (fallback for non-taggable stores).
+     *
+     * This is O(n) where n = number of features when no specific features
+     * are provided.
+     *
+     * @param Workspace $workspace The workspace to invalidate
+     * @param array<string> $featureCodes Specific features (empty = all)
+     */
+    protected function invalidateCacheWithoutTags(Workspace $workspace, array $featureCodes = []): void
+    {
+        // Determine which features to clear
+        $codesToClear = empty($featureCodes)
+            ? Feature::pluck('code')->all()
+            : $featureCodes;
+
+        foreach ($codesToClear as $code) {
             Cache::forget("entitlement:{$workspace->id}:limit:{$code}");
             Cache::forget("entitlement:{$workspace->id}:usage:{$code}");
+        }
+    }
+
+    /**
+     * Invalidate only usage cache for a workspace (limits remain cached).
+     *
+     * Use this for performance when only usage has changed (e.g., after recording
+     * usage) and limits are known to be unchanged.
+     *
+     * @param Workspace $workspace The workspace to invalidate usage cache for
+     * @param string $featureCode The specific feature code to invalidate
+     */
+    public function invalidateUsageCache(Workspace $workspace, string $featureCode): void
+    {
+        $cacheKey = "entitlement:{$workspace->id}:usage:{$featureCode}";
+
+        if ($this->supportsCacheTags()) {
+            Cache::tags($this->getWorkspaceCacheTags($workspace, 'usage'))->forget($cacheKey);
+        } else {
+            Cache::forget($cacheKey);
+        }
+
+        // Dispatch granular event
+        EntitlementCacheInvalidated::dispatch(
+            $workspace,
+            null,
+            [$featureCode],
+            EntitlementCacheInvalidated::REASON_USAGE_RECORDED
+        );
+    }
+
+    /**
+     * Invalidate only limit cache for a workspace (usage remains cached).
+     *
+     * Use this for performance when only limits have changed (e.g., after
+     * provisioning a package or boost) and usage data is unchanged.
+     *
+     * @param Workspace $workspace The workspace to invalidate limit cache for
+     * @param array<string> $featureCodes Specific features (empty = all limit caches)
+     */
+    public function invalidateLimitCache(Workspace $workspace, array $featureCodes = []): void
+    {
+        $codesToClear = empty($featureCodes)
+            ? Feature::pluck('code')->all()
+            : $featureCodes;
+
+        if ($this->supportsCacheTags()) {
+            $workspaceTag = self::CACHE_TAG_WORKSPACE.':'.$workspace->id;
+
+            if (empty($featureCodes)) {
+                // Flush all limit caches for this workspace
+                Cache::tags([$workspaceTag, self::CACHE_TAG_LIMITS])->flush();
+            } else {
+                foreach ($codesToClear as $code) {
+                    $cacheKey = "entitlement:{$workspace->id}:limit:{$code}";
+                    Cache::tags([$workspaceTag, self::CACHE_TAG_LIMITS])->forget($cacheKey);
+                }
+            }
+        } else {
+            foreach ($codesToClear as $code) {
+                Cache::forget("entitlement:{$workspace->id}:limit:{$code}");
+            }
         }
     }
 
@@ -1210,8 +1453,11 @@ class EntitlementService
             ->where('status', Boost::STATUS_ACTIVE)
             ->get();
 
+        $expiredFeatureCodes = [];
+
         foreach ($boosts as $boost) {
             $boost->expire();
+            $expiredFeatureCodes[] = $boost->feature_code;
 
             EntitlementLog::logBoostAction(
                 $workspace,
@@ -1222,7 +1468,14 @@ class EntitlementService
             );
         }
 
-        $this->invalidateCache($workspace);
+        // Only invalidate cache for affected features
+        if (! empty($expiredFeatureCodes)) {
+            $this->invalidateCache(
+                $workspace,
+                featureCodes: array_unique($expiredFeatureCodes),
+                reason: EntitlementCacheInvalidated::REASON_BOOST_EXPIRED
+            );
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -1248,7 +1501,7 @@ class EntitlementService
     {
         $cacheKey = "entitlement:ns:{$namespace->id}:limit:{$featureCode}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($namespace, $featureCode) {
+        $callback = function () use ($namespace, $featureCode) {
             $feature = $this->getFeature($featureCode);
 
             if (! $feature) {
@@ -1308,7 +1561,15 @@ class EntitlementService
             }
 
             return $hasFeature ? $totalLimit : null;
-        });
+        };
+
+        // Use tagged cache if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            return Cache::tags($this->getNamespaceCacheTags($namespace, 'limit'))
+                ->remember($cacheKey, self::CACHE_TTL, $callback);
+        }
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, $callback);
     }
 
     /**
@@ -1328,7 +1589,7 @@ class EntitlementService
     {
         $cacheKey = "entitlement:ns:{$namespace->id}:usage:{$featureCode}";
 
-        return Cache::remember($cacheKey, 60, function () use ($namespace, $featureCode, $feature) {
+        $callback = function () use ($namespace, $featureCode, $feature) {
             // Determine the time window for usage calculation
             if ($feature->resetsMonthly()) {
                 // Get billing cycle anchor from the primary package
@@ -1361,7 +1622,15 @@ class EntitlementService
             return UsageRecord::where('namespace_id', $namespace->id)
                 ->where('feature_code', $featureCode)
                 ->sum('quantity');
-        });
+        };
+
+        // Use tagged cache if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            return Cache::tags($this->getNamespaceCacheTags($namespace, 'usage'))
+                ->remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
+        }
+
+        return Cache::remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
     }
 
     /**
@@ -1620,6 +1889,11 @@ class EntitlementService
      * calculations on the next entitlement check. This is called automatically
      * when namespace packages, boosts, or usage records change.
      *
+     * ## Performance
+     *
+     * When cache tags are supported (Redis, Memcached), this is an O(1) operation.
+     * For other cache drivers, falls back to O(n) iteration where n = feature count.
+     *
      * ## When Called Automatically
      *
      * - After `recordNamespaceUsage()`
@@ -1638,15 +1912,106 @@ class EntitlementService
      * ```
      *
      * @param Namespace_ $namespace The namespace to invalidate caches for
+     * @param array<string> $featureCodes Specific features to invalidate (empty = all)
+     * @param string $reason The reason for invalidation (for event dispatch)
      *
      * @see self::invalidateCache() For workspace-level cache invalidation
      */
-    public function invalidateNamespaceCache(Namespace_ $namespace): void
+    public function invalidateNamespaceCache(
+        Namespace_ $namespace,
+        array $featureCodes = [],
+        string $reason = EntitlementCacheInvalidated::REASON_MANUAL
+    ): void {
+        // Use cache tags if available for O(1) invalidation
+        if ($this->supportsCacheTags()) {
+            $this->invalidateNamespaceCacheWithTags($namespace, $featureCodes);
+        } else {
+            $this->invalidateNamespaceCacheWithoutTags($namespace, $featureCodes);
+        }
+
+        // Dispatch event for external listeners
+        EntitlementCacheInvalidated::dispatch(
+            null,
+            $namespace,
+            $featureCodes,
+            $reason
+        );
+    }
+
+    /**
+     * Invalidate namespace cache using cache tags (O(1) operation).
+     *
+     * @param Namespace_ $namespace The namespace to invalidate
+     * @param array<string> $featureCodes Specific features (empty = all)
+     */
+    protected function invalidateNamespaceCacheWithTags(Namespace_ $namespace, array $featureCodes = []): void
     {
-        $features = Feature::pluck('code');
-        foreach ($features as $code) {
+        $namespaceTag = self::CACHE_TAG_NAMESPACE.':'.$namespace->id;
+
+        if (empty($featureCodes)) {
+            // Flush all cache for this namespace - O(1) with tags
+            Cache::tags([$namespaceTag])->flush();
+
+            return;
+        }
+
+        // Granular invalidation for specific features
+        foreach ($featureCodes as $featureCode) {
+            $limitKey = "entitlement:ns:{$namespace->id}:limit:{$featureCode}";
+            $usageKey = "entitlement:ns:{$namespace->id}:usage:{$featureCode}";
+
+            Cache::tags([$namespaceTag, self::CACHE_TAG_LIMITS])->forget($limitKey);
+            Cache::tags([$namespaceTag, self::CACHE_TAG_USAGE])->forget($usageKey);
+        }
+    }
+
+    /**
+     * Invalidate namespace cache without tags (fallback for non-taggable stores).
+     *
+     * This is O(n) where n = number of features when no specific features
+     * are provided.
+     *
+     * @param Namespace_ $namespace The namespace to invalidate
+     * @param array<string> $featureCodes Specific features (empty = all)
+     */
+    protected function invalidateNamespaceCacheWithoutTags(Namespace_ $namespace, array $featureCodes = []): void
+    {
+        // Determine which features to clear
+        $codesToClear = empty($featureCodes)
+            ? Feature::pluck('code')->all()
+            : $featureCodes;
+
+        foreach ($codesToClear as $code) {
             Cache::forget("entitlement:ns:{$namespace->id}:limit:{$code}");
             Cache::forget("entitlement:ns:{$namespace->id}:usage:{$code}");
         }
+    }
+
+    /**
+     * Invalidate only usage cache for a namespace (limits remain cached).
+     *
+     * Use this for performance when only usage has changed (e.g., after recording
+     * usage) and limits are known to be unchanged.
+     *
+     * @param Namespace_ $namespace The namespace to invalidate usage cache for
+     * @param string $featureCode The specific feature code to invalidate
+     */
+    public function invalidateNamespaceUsageCache(Namespace_ $namespace, string $featureCode): void
+    {
+        $cacheKey = "entitlement:ns:{$namespace->id}:usage:{$featureCode}";
+
+        if ($this->supportsCacheTags()) {
+            Cache::tags($this->getNamespaceCacheTags($namespace, 'usage'))->forget($cacheKey);
+        } else {
+            Cache::forget($cacheKey);
+        }
+
+        // Dispatch granular event
+        EntitlementCacheInvalidated::dispatch(
+            null,
+            $namespace,
+            [$featureCode],
+            EntitlementCacheInvalidated::REASON_USAGE_RECORDED
+        );
     }
 }

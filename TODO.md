@@ -181,7 +181,7 @@ Need HTTP-level integration tests for the API endpoints, including authenticatio
 ---
 
 ### PERF-001: Optimise EntitlementService cache invalidation
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `Services/EntitlementService.php`
 
 The `invalidateCache()` method iterates all features and clears each key individually. This is O(n) where n = feature count.
@@ -190,6 +190,26 @@ The `invalidateCache()` method iterates all features and clears each key individ
 - Use cache tags when available (Redis)
 - Implement version-based cache busting
 - Benchmark before/after with 100+ features
+
+**Resolution:**
+- Added cache tag support for O(1) invalidation when using Redis/Memcached:
+  - Workspace-scoped tags: `entitlement:ws:{id}`
+  - Namespace-scoped tags: `entitlement:ns:{id}`
+  - Type-specific tags: `entitlement:limits`, `entitlement:usage`
+- Added granular invalidation methods:
+  - `invalidateUsageCache()` - invalidates only usage data for a specific feature
+  - `invalidateLimitCache()` - invalidates only limit data
+  - `invalidateNamespaceUsageCache()` - namespace-scoped usage invalidation
+- Updated `recordUsage()` and `recordNamespaceUsage()` to use granular invalidation
+- Falls back to O(n) iteration for non-taggable cache drivers (file, database)
+- Created `EntitlementCacheInvalidated` event for event-driven cache management
+- Event includes reason constants for audit/debugging:
+  - `REASON_USAGE_RECORDED`, `REASON_PACKAGE_PROVISIONED`, `REASON_PACKAGE_SUSPENDED`
+  - `REASON_PACKAGE_REACTIVATED`, `REASON_PACKAGE_REVOKED`, `REASON_BOOST_PROVISIONED`
+  - `REASON_BOOST_EXPIRED`, `REASON_MANUAL`
+- Added `supportsCacheTags()` helper to detect taggable stores
+- `provisionBoost()` now invalidates only the affected feature's cache
+- `expireCycleBoundBoosts()` collects affected features and invalidates granularly
 
 ---
 
