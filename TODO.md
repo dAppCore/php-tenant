@@ -127,16 +127,22 @@ Several files were missing `declare(strict_types=1);`:
 ---
 
 ### DX-002: Document EntitlementService public API
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `Services/EntitlementService.php`
 
 The EntitlementService is the core API for entitlement checks but lacks comprehensive PHPDoc. External consumers need clear documentation.
 
-**Acceptance Criteria:**
-- Add complete PHPDoc to all public methods
-- Document exception conditions
-- Add @throws annotations where applicable
-- Create usage examples in documentation
+**Resolution:**
+- Added comprehensive class-level PHPDoc explaining key concepts (Features, Packages, Boosts, Usage Records)
+- Documented all public methods with:
+  - Detailed descriptions of purpose and behaviour
+  - Complete parameter documentation with types
+  - Return type documentation with structure details
+  - `@throws` annotations where applicable
+  - Usage examples in docblocks
+- Documented the entitlement cascade model (namespace -> workspace -> user tier)
+- Added examples for common use cases (checking entitlements, recording usage, provisioning)
+- Documented caching behaviour and invalidation triggers
 
 ---
 
