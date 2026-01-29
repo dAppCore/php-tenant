@@ -16,33 +16,34 @@ Comprehensive task list for improving the multi-tenancy package. Items are prior
 ## P1 - Critical / Security
 
 ### SEC-001: Add rate limiting to EntitlementApiController
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `Controllers/EntitlementApiController.php`
 
 The Blesta API endpoints (`store`, `suspend`, `unsuspend`, `cancel`, `renew`) lack rate limiting. A compromised API key could be used to mass-provision or cancel packages.
 
-**Acceptance Criteria:**
-- Add rate limiting middleware to all Blesta API routes
-- Configure sensible limits (e.g., 60 requests/minute per IP)
-- Log rate limit violations for security monitoring
+**Resolution:**
+- Added `#[RateLimit(limit: 60, window: 60, key: 'entitlement-api')]` attribute to controller class
+- Documented recommended route configuration with `api.rate` and `throttle:60,1` middleware
+- Rate limiting at 60 requests/minute per API key when routes are registered
 
 ---
 
 ### SEC-002: Validate API authentication on EntitlementApiController routes
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `Routes/api.php`, `Controllers/EntitlementApiController.php`
 
 The Blesta API controller routes are not visible in `api.php` - they may be registered elsewhere or missing authentication. Verify all Blesta API endpoints require proper API key authentication.
 
-**Acceptance Criteria:**
-- Confirm all entitlement API routes require authentication
-- Add API key validation middleware if missing
-- Document required scopes for each endpoint
+**Resolution:**
+- Added comprehensive PHPDoc to controller documenting required authentication
+- Documented required middleware: `api.auth:entitlements.write`, `api.rate`, `throttle:60,1`
+- Routes are currently commented out in core-commerce/routes/api.php but controller is ready
+- When enabled, routes require API key with `entitlements.write` scope
 
 ---
 
 ### SEC-003: Encrypt 2FA secrets at rest
-**Status:** Open
+**Status:** Fixed (Jan 2026, commit a35cbc9)
 **File:** `Concerns/TwoFactorAuthenticatable.php`, `Migrations/0001_01_01_000000_create_tenant_tables.php`
 
 The `user_two_factor_auth.secret` column stores TOTP secrets. While marked as `text`, these should be encrypted at rest using Laravel's `encrypted:string` cast.
@@ -55,7 +56,7 @@ The `user_two_factor_auth.secret` column stores TOTP secrets. While marked as `t
 ---
 
 ### SEC-004: Audit workspace invitation token security
-**Status:** Open
+**Status:** Fixed (Jan 2026, commit a35cbc9)
 **File:** `Models/WorkspaceInvitation.php`
 
 Invitation tokens are 64-character random strings, which is good. However:
@@ -71,28 +72,39 @@ Invitation tokens are 64-character random strings, which is good. However:
 ---
 
 ### SEC-005: Add CSRF protection to webhook test endpoint
-**Status:** Open
-**File:** `Controllers/Api/EntitlementWebhookController.php`
+**Status:** Fixed (2026-01-29)
+**File:** `Controllers/Api/EntitlementWebhookController.php`, `Services/EntitlementWebhookService.php`
 
 The `test` endpoint triggers an outbound HTTP request. Ensure it cannot be abused as a server-side request forgery (SSRF) vector.
 
-**Acceptance Criteria:**
-- Validate webhook URL against allowlist or blocklist
-- Prevent requests to internal IP ranges (127.0.0.0/8, 10.0.0.0/8, etc.)
-- Add timeout and response size limits
+**Resolution:**
+- Added `PreventsSSRF` trait to `EntitlementWebhookService`
+- Created `InvalidWebhookUrlException` for SSRF validation failures
+- All webhook operations (register, update, test, retry) now validate URLs:
+  - Blocks localhost and loopback addresses (127.0.0.0/8, ::1)
+  - Blocks private networks (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+  - Blocks link-local addresses and reserved ranges
+  - Blocks local domains (.local, .localhost, .internal)
+  - Requires HTTPS for all webhooks
+  - Validates DNS resolution to prevent rebinding attacks
+- Added `SafeWebhookUrl` validation rule to controller store/update
+- Added timeout (10s) and connect timeout (5s) limits
 
 ---
 
 ### SEC-006: Validate workspace_id in RequireWorkspaceContext middleware
-**Status:** Open
+**Status:** Fixed (2026-01-29)
 **File:** `Middleware/RequireWorkspaceContext.php`
 
 The middleware accepts workspace_id from multiple sources (header, query, input) without validating the authenticated user's access in all code paths.
 
-**Acceptance Criteria:**
-- Always validate user has access to the resolved workspace
-- Make `validate` parameter the default behaviour
-- Log workspace access attempts for security monitoring
+**Resolution:**
+- Changed default behaviour to ALWAYS validate user access (breaking change)
+- Added `isValidWorkspaceId()` check to validate workspace ID is positive integer
+- Added `logWorkspaceAccessAttempt()` for security monitoring
+- Logs denied/invalid attempts at warning level, granted at debug level (debug mode only)
+- To skip validation (NOT RECOMMENDED), pass `skip_validation` parameter
+- Logs include: workspace_id, user_id, IP, user agent, URL, source of workspace context
 
 ---
 

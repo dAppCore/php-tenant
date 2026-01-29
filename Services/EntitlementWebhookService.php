@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Services;
 
+use Core\Tenant\Concerns\PreventsSSRF;
 use Core\Tenant\Contracts\EntitlementWebhookEvent;
 use Core\Tenant\Enums\WebhookDeliveryStatus;
 use Core\Tenant\Events\Webhook\BoostActivatedEvent;
@@ -11,6 +12,7 @@ use Core\Tenant\Events\Webhook\BoostExpiredEvent;
 use Core\Tenant\Events\Webhook\LimitReachedEvent;
 use Core\Tenant\Events\Webhook\LimitWarningEvent;
 use Core\Tenant\Events\Webhook\PackageChangedEvent;
+use Core\Tenant\Exceptions\InvalidWebhookUrlException;
 use Core\Tenant\Jobs\DispatchEntitlementWebhook;
 use Core\Tenant\Models\EntitlementWebhook;
 use Core\Tenant\Models\EntitlementWebhookDelivery;
@@ -23,9 +25,13 @@ use Illuminate\Support\Str;
  * Service for managing and dispatching entitlement webhooks.
  *
  * Handles webhook registration, event dispatch, payload signing, and delivery tracking.
+ *
+ * SECURITY: All outbound webhook requests are validated against SSRF attacks.
+ * URLs targeting localhost, private networks, or local domains are blocked.
  */
 class EntitlementWebhookService
 {
+    use PreventsSSRF;
     /**
      * Dispatch an event to all matching webhooks for a workspace.
      *
@@ -83,6 +89,8 @@ class EntitlementWebhookService
 
     /**
      * Register a new webhook for a workspace.
+     *
+     * @throws InvalidWebhookUrlException When the webhook URL fails SSRF validation
      */
     public function register(
         Workspace $workspace,
@@ -92,6 +100,21 @@ class EntitlementWebhookService
         ?string $secret = null,
         array $metadata = []
     ): EntitlementWebhook {
+        // SECURITY: Validate URL against SSRF before registration
+        $ssrfValidation = $this->validateUrlForSSRF($url);
+        if (! $ssrfValidation['valid']) {
+            Log::warning('Webhook registration blocked due to SSRF validation failure', [
+                'workspace_id' => $workspace->id,
+                'url' => $url,
+                'reason' => $ssrfValidation['error'],
+            ]);
+
+            throw InvalidWebhookUrlException::ssrfViolation(
+                $url,
+                $ssrfValidation['error'] ?? 'Unknown validation error'
+            );
+        }
+
         // Generate secret if not provided
         $secret ??= bin2hex(random_bytes(32));
 
@@ -117,11 +140,32 @@ class EntitlementWebhookService
 
     /**
      * Update webhook configuration.
+     *
+     * @throws InvalidWebhookUrlException When the updated webhook URL fails SSRF validation
      */
     public function update(
         EntitlementWebhook $webhook,
         array $attributes
     ): EntitlementWebhook {
+        // SECURITY: Validate new URL against SSRF if being updated
+        if (isset($attributes['url']) && $attributes['url'] !== $webhook->url) {
+            $ssrfValidation = $this->validateUrlForSSRF($attributes['url']);
+            if (! $ssrfValidation['valid']) {
+                Log::warning('Webhook update blocked due to SSRF validation failure', [
+                    'webhook_id' => $webhook->id,
+                    'workspace_id' => $webhook->workspace_id,
+                    'old_url' => $webhook->url,
+                    'new_url' => $attributes['url'],
+                    'reason' => $ssrfValidation['error'],
+                ]);
+
+                throw InvalidWebhookUrlException::ssrfViolation(
+                    $attributes['url'],
+                    $ssrfValidation['error'] ?? 'Unknown validation error'
+                );
+            }
+        }
+
         // Filter events to only allowed values
         if (isset($attributes['events'])) {
             $attributes['events'] = array_intersect($attributes['events'], EntitlementWebhook::EVENTS);
@@ -205,9 +249,27 @@ class EntitlementWebhookService
 
     /**
      * Test a webhook by sending a test event.
+     *
+     * @throws InvalidWebhookUrlException When the webhook URL fails SSRF validation
      */
     public function testWebhook(EntitlementWebhook $webhook): EntitlementWebhookDelivery
     {
+        // SECURITY: Validate URL against SSRF before making request
+        $ssrfValidation = $this->validateUrlForSSRF($webhook->url);
+        if (! $ssrfValidation['valid']) {
+            Log::warning('Webhook test blocked due to SSRF validation failure', [
+                'webhook_id' => $webhook->id,
+                'workspace_id' => $webhook->workspace_id,
+                'url' => $webhook->url,
+                'reason' => $ssrfValidation['error'],
+            ]);
+
+            throw InvalidWebhookUrlException::ssrfViolation(
+                $webhook->url,
+                $ssrfValidation['error'] ?? 'Unknown validation error'
+            );
+        }
+
         $testPayload = [
             'event' => 'test',
             'data' => [
@@ -231,9 +293,12 @@ class EntitlementWebhookService
                 $headers['X-Signature'] = $this->sign($testPayload, $webhook->secret);
             }
 
-            $response = Http::withHeaders($headers)
+            // Build HTTP client with optional IP override for DNS rebinding protection
+            $httpClient = Http::withHeaders($headers)
                 ->timeout(10)
-                ->post($webhook->url, $testPayload);
+                ->connectTimeout(5);
+
+            $response = $httpClient->post($webhook->url, $testPayload);
 
             $status = in_array($response->status(), [200, 201, 202, 204])
                 ? WebhookDeliveryStatus::SUCCESS
@@ -262,6 +327,8 @@ class EntitlementWebhookService
 
     /**
      * Retry a failed delivery.
+     *
+     * @throws InvalidWebhookUrlException When the webhook URL fails SSRF validation
      */
     public function retryDelivery(EntitlementWebhookDelivery $delivery): EntitlementWebhookDelivery
     {
@@ -269,6 +336,23 @@ class EntitlementWebhookService
 
         if (! $webhook->isActive()) {
             throw new \RuntimeException('Cannot retry delivery for inactive webhook');
+        }
+
+        // SECURITY: Re-validate URL against SSRF before retry (URL may have been updated)
+        $ssrfValidation = $this->validateUrlForSSRF($webhook->url);
+        if (! $ssrfValidation['valid']) {
+            Log::warning('Webhook retry blocked due to SSRF validation failure', [
+                'webhook_id' => $webhook->id,
+                'delivery_id' => $delivery->id,
+                'workspace_id' => $webhook->workspace_id,
+                'url' => $webhook->url,
+                'reason' => $ssrfValidation['error'],
+            ]);
+
+            throw InvalidWebhookUrlException::ssrfViolation(
+                $webhook->url,
+                $ssrfValidation['error'] ?? 'Unknown validation error'
+            );
         }
 
         $payload = $delivery->payload;
@@ -287,6 +371,7 @@ class EntitlementWebhookService
 
             $response = Http::withHeaders($headers)
                 ->timeout(10)
+                ->connectTimeout(5)
                 ->post($webhook->url, $payload);
 
             $status = in_array($response->status(), [200, 201, 202, 204])

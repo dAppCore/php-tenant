@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Controllers;
 
+use Core\Api\RateLimit\RateLimit;
 use Core\Front\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Core\Tenant\Models\EntitlementLog;
 use Core\Tenant\Models\Package;
@@ -16,6 +18,30 @@ use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspacePackage;
 use Core\Tenant\Services\EntitlementService;
 
+/**
+ * API controller for entitlement management.
+ *
+ * SECURITY: The Blesta API endpoints (store, suspend, unsuspend, cancel, renew, show)
+ * require API key authentication and should only be registered behind the
+ * 'api.auth' middleware with appropriate scopes.
+ *
+ * Recommended route configuration:
+ * ```php
+ * Route::middleware(['api.auth:entitlements.write', 'api.rate', 'throttle:60,1'])
+ *     ->prefix('provisioning/entitlements')
+ *     ->group(function () {
+ *         Route::post('/', [EntitlementApiController::class, 'store']);
+ *         Route::get('/{id}', [EntitlementApiController::class, 'show']);
+ *         Route::post('/{id}/suspend', [EntitlementApiController::class, 'suspend']);
+ *         Route::post('/{id}/unsuspend', [EntitlementApiController::class, 'unsuspend']);
+ *         Route::post('/{id}/cancel', [EntitlementApiController::class, 'cancel']);
+ *         Route::post('/{id}/renew', [EntitlementApiController::class, 'renew']);
+ *     });
+ * ```
+ *
+ * Rate limits are enforced at 60 requests/minute per API key for provisioning endpoints.
+ */
+#[RateLimit(limit: 60, window: 60, key: 'entitlement-api')]
 class EntitlementApiController extends Controller
 {
     public function __construct(

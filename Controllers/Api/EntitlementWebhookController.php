@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Controllers\Api;
 
+use Core\Rules\SafeWebhookUrl;
+use Core\Tenant\Exceptions\InvalidWebhookUrlException;
 use Core\Tenant\Models\EntitlementWebhook;
 use Core\Tenant\Models\EntitlementWebhookDelivery;
 use Core\Tenant\Models\Workspace;
@@ -17,6 +19,9 @@ use Illuminate\Validation\Rule;
  * API controller for entitlement webhook management.
  *
  * Provides CRUD operations for webhooks and delivery history.
+ *
+ * SECURITY: All webhook URLs are validated against SSRF attacks.
+ * The test endpoint cannot be used to probe internal networks.
  */
 class EntitlementWebhookController extends Controller
 {
@@ -49,27 +54,34 @@ class EntitlementWebhookController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'url', 'max:2048'],
+            'url' => ['required', 'url', 'max:2048', new SafeWebhookUrl],
             'events' => ['required', 'array', 'min:1'],
             'events.*' => ['string', Rule::in(EntitlementWebhook::EVENTS)],
             'secret' => ['nullable', 'string', 'min:32'],
             'metadata' => ['nullable', 'array'],
         ]);
 
-        $webhook = $this->webhookService->register(
-            workspace: $workspace,
-            name: $validated['name'],
-            url: $validated['url'],
-            events: $validated['events'],
-            secret: $validated['secret'] ?? null,
-            metadata: $validated['metadata'] ?? []
-        );
+        try {
+            $webhook = $this->webhookService->register(
+                workspace: $workspace,
+                name: $validated['name'],
+                url: $validated['url'],
+                events: $validated['events'],
+                secret: $validated['secret'] ?? null,
+                metadata: $validated['metadata'] ?? []
+            );
 
-        return response()->json([
-            'message' => __('Webhook created successfully'),
-            'webhook' => $webhook,
-            'secret' => $webhook->secret, // Return secret on creation only
-        ], 201);
+            return response()->json([
+                'message' => __('Webhook created successfully'),
+                'webhook' => $webhook,
+                'secret' => $webhook->secret, // Return secret on creation only
+            ], 201);
+        } catch (InvalidWebhookUrlException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'invalid_webhook_url',
+            ], 422);
+        }
     }
 
     /**
@@ -97,7 +109,7 @@ class EntitlementWebhookController extends Controller
 
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'url' => ['sometimes', 'url', 'max:2048'],
+            'url' => ['sometimes', 'url', 'max:2048', new SafeWebhookUrl],
             'events' => ['sometimes', 'array', 'min:1'],
             'events.*' => ['string', Rule::in(EntitlementWebhook::EVENTS)],
             'is_active' => ['sometimes', 'boolean'],
@@ -105,12 +117,19 @@ class EntitlementWebhookController extends Controller
             'metadata' => ['sometimes', 'array'],
         ]);
 
-        $webhook = $this->webhookService->update($webhook, $validated);
+        try {
+            $webhook = $this->webhookService->update($webhook, $validated);
 
-        return response()->json([
-            'message' => __('Webhook updated successfully'),
-            'webhook' => $webhook,
-        ]);
+            return response()->json([
+                'message' => __('Webhook updated successfully'),
+                'webhook' => $webhook,
+            ]);
+        } catch (InvalidWebhookUrlException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'invalid_webhook_url',
+            ], 422);
+        }
     }
 
     /**
@@ -144,19 +163,30 @@ class EntitlementWebhookController extends Controller
 
     /**
      * Send a test webhook.
+     *
+     * SECURITY: This endpoint validates the webhook URL against SSRF before
+     * making any outbound request. Requests to internal networks are blocked.
      */
     public function test(Request $request, EntitlementWebhook $webhook): JsonResponse
     {
         $this->authorizeWebhook($request, $webhook);
 
-        $delivery = $this->webhookService->testWebhook($webhook);
+        try {
+            $delivery = $this->webhookService->testWebhook($webhook);
 
-        return response()->json([
-            'message' => $delivery->isSucceeded()
-                ? __('Test webhook sent successfully')
-                : __('Test webhook failed'),
-            'delivery' => $delivery,
-        ]);
+            return response()->json([
+                'message' => $delivery->isSucceeded()
+                    ? __('Test webhook sent successfully')
+                    : __('Test webhook failed'),
+                'delivery' => $delivery,
+            ]);
+        } catch (InvalidWebhookUrlException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'invalid_webhook_url',
+                'reason' => $e->reason,
+            ], 422);
+        }
     }
 
     /**
