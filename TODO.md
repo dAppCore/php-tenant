@@ -15,6 +15,22 @@ Comprehensive task list for improving the multi-tenancy package. Items are prior
 
 ## P1 - Critical / Security
 
+### BUG-001: Missing `namespace_id` columns — namespace entitlements crash at runtime
+**Status:** Open (discovered 2026-02-20, issue #2 phase-0 assessment)
+**Files:** `Migrations/0001_01_01_000000_create_tenant_tables.php`, `Models/UsageRecord.php`, `Models/Boost.php`, `Services/EntitlementService.php`
+
+The `entitlement_usage_records` and `entitlement_boosts` tables are missing a `namespace_id` column.
+The `UsageRecord` and `Boost` models declare `namespace_id` as `$fillable`, and `EntitlementService`
+writes `namespace_id` in `recordNamespaceUsage()` and `provisionNamespaceBoost()`. Any call to either
+method will throw a database error at runtime.
+
+**Acceptance Criteria:**
+- Create migration adding `namespace_id` (nullable FK → namespaces, nullOnDelete) to both tables
+- Add indexes: `(namespace_id, feature_code, recorded_at)` on usage records; `(namespace_id, feature_code, status)` on boosts
+- Verify namespace-level entitlement tests pass after migration
+
+---
+
 ### SEC-001: Add rate limiting to EntitlementApiController
 **Status:** Fixed (2026-01-29)
 **File:** `Controllers/EntitlementApiController.php`
@@ -295,6 +311,32 @@ The workspace creation uses hardcoded domain `'hub.host.uk.com'`. This should be
 ---
 
 ## P3 - Medium Priority
+
+### DX-005: Add `declare(strict_types=1)` to remaining model/service files
+**Status:** Open (discovered 2026-02-20, issue #2 phase-0 assessment)
+**Files:** `Models/AccountDeletionRequest.php`, `Models/Boost.php`, `Models/EntitlementLog.php`, `Models/Feature.php`, `Models/Package.php`, `Models/UsageRecord.php`, `Models/WaitlistEntry.php`, `Models/WorkspacePackage.php`, `Services/EntitlementResult.php`
+
+Nine files are still missing `declare(strict_types=1)` despite it being a documented coding standard (DX-001 only fixed three files).
+
+**Acceptance Criteria:**
+- Add `declare(strict_types=1);` immediately after `<?php` in all nine files
+- Run `vendor/bin/pint --dirty` to verify no style issues are introduced
+- Confirm no type errors surface in existing tests
+
+---
+
+### ENV-001: Configure `host-uk/core` repository so `composer install` succeeds
+**Status:** Open (discovered 2026-02-20, issue #2 phase-0 assessment)
+**File:** `composer.json`
+
+`composer install` fails because `host-uk/core` is a private package and no `repositories` entry is present. This blocks all tooling (tests, Pint, PHPStan).
+
+**Acceptance Criteria:**
+- Add `repositories` entry to `composer.json` (Forgejo Composer registry or local path for dev)
+- Document the required auth token / env var setup in `README.md` or a `CONTRIBUTING.md`
+- `composer install` completes without errors in CI
+
+---
 
 ### DX-003: Add return type hints to all Workspace relationships
 **Status:** Open
