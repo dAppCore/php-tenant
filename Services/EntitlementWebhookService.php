@@ -32,6 +32,7 @@ use Illuminate\Support\Str;
 class EntitlementWebhookService
 {
     use PreventsSSRF;
+
     /**
      * Dispatch an event to all matching webhooks for a workspace.
      *

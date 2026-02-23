@@ -137,8 +137,8 @@ class EntitlementService
     /**
      * Get cache tags for workspace entitlements.
      *
-     * @param Workspace $workspace The workspace
-     * @param string $type The cache type ('limit' or 'usage')
+     * @param  Workspace  $workspace  The workspace
+     * @param  string  $type  The cache type ('limit' or 'usage')
      * @return array<string> Cache tags
      */
     protected function getWorkspaceCacheTags(Workspace $workspace, string $type = 'limit'): array
@@ -159,8 +159,8 @@ class EntitlementService
     /**
      * Get cache tags for namespace entitlements.
      *
-     * @param Namespace_ $namespace The namespace
-     * @param string $type The cache type ('limit' or 'usage')
+     * @param  Namespace_  $namespace  The namespace
+     * @param  string  $type  The cache type ('limit' or 'usage')
      * @return array<string> Cache tags
      */
     protected function getNamespaceCacheTags(Namespace_ $namespace, string $type = 'limit'): array
@@ -213,11 +213,10 @@ class EntitlementService
      * echo "Remaining: {$result->getRemaining()}";
      * ```
      *
-     * @param Workspace $workspace The workspace to check entitlements for
-     * @param string $featureCode The feature code to check (e.g., 'pages', 'api_calls', 'custom_domains')
-     * @param int $quantity The quantity being requested (default: 1). For limit-based features,
-     *                      checks if current usage plus this quantity exceeds the limit.
-     *
+     * @param  Workspace  $workspace  The workspace to check entitlements for
+     * @param  string  $featureCode  The feature code to check (e.g., 'pages', 'api_calls', 'custom_domains')
+     * @param  int  $quantity  The quantity being requested (default: 1). For limit-based features,
+     *                         checks if current usage plus this quantity exceeds the limit.
      * @return EntitlementResult Contains:
      *                           - `isAllowed()`: Whether the feature can be used
      *                           - `isDenied()`: Inverse of isAllowed
@@ -316,10 +315,9 @@ class EntitlementService
      * // Uses workspace's 'pages' limit if namespace has no direct package
      * ```
      *
-     * @param Namespace_ $namespace The namespace to check entitlements for
-     * @param string $featureCode The feature code to check
-     * @param int $quantity The quantity being requested (default: 1)
-     *
+     * @param  Namespace_  $namespace  The namespace to check entitlements for
+     * @param  string  $featureCode  The feature code to check
+     * @param  int  $quantity  The quantity being requested (default: 1)
      * @return EntitlementResult Contains allowed status, limits, and usage information
      *
      * @see self::can() For workspace-level checks
@@ -432,12 +430,11 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Namespace_ $namespace The namespace to record usage for
-     * @param string $featureCode The feature code being consumed
-     * @param int $quantity The amount to record (default: 1)
-     * @param User|null $user Optional user who triggered the usage (for attribution)
-     * @param array<string, mixed>|null $metadata Optional metadata for audit/debugging
-     *
+     * @param  Namespace_  $namespace  The namespace to record usage for
+     * @param  string  $featureCode  The feature code being consumed
+     * @param  int  $quantity  The amount to record (default: 1)
+     * @param  User|null  $user  Optional user who triggered the usage (for attribution)
+     * @param  array<string, mixed>|null  $metadata  Optional metadata for audit/debugging
      * @return UsageRecord The created usage record
      */
     public function recordNamespaceUsage(
@@ -500,12 +497,11 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to record usage for
-     * @param string $featureCode The feature code being consumed
-     * @param int $quantity The amount to record (default: 1)
-     * @param User|null $user Optional user who triggered the usage
-     * @param array<string, mixed>|null $metadata Optional metadata for audit/debugging
-     *
+     * @param  Workspace  $workspace  The workspace to record usage for
+     * @param  string  $featureCode  The feature code being consumed
+     * @param  int  $quantity  The amount to record (default: 1)
+     * @param  User|null  $user  Optional user who triggered the usage
+     * @param  array<string, mixed>|null  $metadata  Optional metadata for audit/debugging
      * @return UsageRecord The created usage record
      */
     public function recordUsage(
@@ -576,8 +572,8 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to provision the package for
-     * @param string $packageCode The unique code of the package to provision
+     * @param  Workspace  $workspace  The workspace to provision the package for
+     * @param  string  $packageCode  The unique code of the package to provision
      * @param array{
      *     source?: string,
      *     starts_at?: \DateTimeInterface,
@@ -592,7 +588,6 @@ class EntitlementService
      *     - `billing_cycle_anchor`: Date for monthly usage resets
      *     - `blesta_service_id`: External billing system reference
      *     - `metadata`: Additional data to store with the package
-     *
      * @return WorkspacePackage The created workspace package record
      *
      * @throws ModelNotFoundException If the package code does not exist
@@ -701,8 +696,8 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to provision the boost for
-     * @param string $featureCode The feature code to boost
+     * @param  Workspace  $workspace  The workspace to provision the boost for
+     * @param  string  $featureCode  The feature code to boost
      * @param array{
      *     boost_type?: string,
      *     duration_type?: string,
@@ -721,7 +716,6 @@ class EntitlementService
      *     - `expires_at`: When the boost expires
      *     - `blesta_addon_id`: External billing reference
      *     - `metadata`: Additional data to store
-     *
      * @return Boost The created boost record
      */
     public function provisionBoost(
@@ -800,8 +794,7 @@ class EntitlementService
      * }
      * ```
      *
-     * @param Workspace $workspace The workspace to get the summary for
-     *
+     * @param  Workspace  $workspace  The workspace to get the summary for
      * @return Collection<string, Collection<int, array{
      *     feature: Feature,
      *     code: string,
@@ -867,8 +860,7 @@ class EntitlementService
      * }
      * ```
      *
-     * @param Workspace $workspace The workspace to get packages for
-     *
+     * @param  Workspace  $workspace  The workspace to get packages for
      * @return Collection<int, WorkspacePackage> Active workspace packages with
      *                                           Package and Feature relations loaded
      */
@@ -907,8 +899,7 @@ class EntitlementService
      * }
      * ```
      *
-     * @param Workspace $workspace The workspace to get boosts for
-     *
+     * @param  Workspace  $workspace  The workspace to get boosts for
      * @return Collection<int, Boost> Active, usable boosts ordered by expiry (soonest first)
      */
     public function getActiveBoosts(Workspace $workspace): Collection
@@ -949,9 +940,9 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to suspend
-     * @param string|null $source The source of the suspension for audit logging
-     *                            (e.g., 'stripe', 'admin', 'system')
+     * @param  Workspace  $workspace  The workspace to suspend
+     * @param  string|null  $source  The source of the suspension for audit logging
+     *                               (e.g., 'stripe', 'admin', 'system')
      *
      * @see self::reactivateWorkspace() To lift the suspension
      */
@@ -999,8 +990,8 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to reactivate
-     * @param string|null $source The source of the reactivation for audit logging
+     * @param  Workspace  $workspace  The workspace to reactivate
+     * @param  string|null  $source  The source of the reactivation for audit logging
      *
      * @see self::suspendWorkspace() To suspend packages
      */
@@ -1060,9 +1051,9 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Workspace $workspace The workspace to revoke the package from
-     * @param string $packageCode The unique code of the package to revoke
-     * @param string|null $source The source of the revocation for audit logging
+     * @param  Workspace  $workspace  The workspace to revoke the package from
+     * @param  string  $packageCode  The unique code of the package to revoke
+     * @param  string|null  $source  The source of the revocation for audit logging
      */
     public function revokePackage(Workspace $workspace, string $packageCode, ?string $source = null): void
     {
@@ -1101,9 +1092,8 @@ class EntitlementService
      * the workspace's total capacity for a feature. This is an internal method
      * used by `can()` and is cached for performance.
      *
-     * @param Workspace $workspace The workspace to calculate limits for
-     * @param string $featureCode The feature code to get the limit for
-     *
+     * @param  Workspace  $workspace  The workspace to calculate limits for
+     * @param  string  $featureCode  The feature code to get the limit for
      * @return int|null Returns:
      *                  - `null` if the feature is not included in any package
      *                  - `-1` if the feature is unlimited
@@ -1190,10 +1180,9 @@ class EntitlementService
      *
      * Results are cached for 60 seconds to reduce database load.
      *
-     * @param Workspace $workspace The workspace to get usage for
-     * @param string $featureCode The feature code to get usage for
-     * @param Feature $feature The feature model (for reset configuration)
-     *
+     * @param  Workspace  $workspace  The workspace to get usage for
+     * @param  string  $featureCode  The feature code to get usage for
+     * @param  Feature  $feature  The feature model (for reset configuration)
      * @return int The current usage count
      */
     protected function getCurrentUsage(Workspace $workspace, string $featureCode, Feature $feature): int
@@ -1241,8 +1230,7 @@ class EntitlementService
      * Retrieves the Feature model from the database, with results cached
      * for the standard cache TTL (5 minutes).
      *
-     * @param string $code The unique feature code (e.g., 'pages', 'api_calls')
-     *
+     * @param  string  $code  The unique feature code (e.g., 'pages', 'api_calls')
      * @return Feature|null The feature model, or null if not found
      */
     protected function getFeature(string $code): ?Feature
@@ -1283,9 +1271,9 @@ class EntitlementService
      * $entitlementService->invalidateCache($workspace);
      * ```
      *
-     * @param Workspace $workspace The workspace to invalidate caches for
-     * @param array<string> $featureCodes Specific features to invalidate (empty = all)
-     * @param string $reason The reason for invalidation (for event dispatch)
+     * @param  Workspace  $workspace  The workspace to invalidate caches for
+     * @param  array<string>  $featureCodes  Specific features to invalidate (empty = all)
+     * @param  string  $reason  The reason for invalidation (for event dispatch)
      */
     public function invalidateCache(
         Workspace $workspace,
@@ -1311,8 +1299,8 @@ class EntitlementService
     /**
      * Invalidate cache using cache tags (O(1) operation).
      *
-     * @param Workspace $workspace The workspace to invalidate
-     * @param array<string> $featureCodes Specific features (empty = all)
+     * @param  Workspace  $workspace  The workspace to invalidate
+     * @param  array<string>  $featureCodes  Specific features (empty = all)
      */
     protected function invalidateCacheWithTags(Workspace $workspace, array $featureCodes = []): void
     {
@@ -1341,8 +1329,8 @@ class EntitlementService
      * This is O(n) where n = number of features when no specific features
      * are provided.
      *
-     * @param Workspace $workspace The workspace to invalidate
-     * @param array<string> $featureCodes Specific features (empty = all)
+     * @param  Workspace  $workspace  The workspace to invalidate
+     * @param  array<string>  $featureCodes  Specific features (empty = all)
      */
     protected function invalidateCacheWithoutTags(Workspace $workspace, array $featureCodes = []): void
     {
@@ -1363,8 +1351,8 @@ class EntitlementService
      * Use this for performance when only usage has changed (e.g., after recording
      * usage) and limits are known to be unchanged.
      *
-     * @param Workspace $workspace The workspace to invalidate usage cache for
-     * @param string $featureCode The specific feature code to invalidate
+     * @param  Workspace  $workspace  The workspace to invalidate usage cache for
+     * @param  string  $featureCode  The specific feature code to invalidate
      */
     public function invalidateUsageCache(Workspace $workspace, string $featureCode): void
     {
@@ -1391,8 +1379,8 @@ class EntitlementService
      * Use this for performance when only limits have changed (e.g., after
      * provisioning a package or boost) and usage data is unchanged.
      *
-     * @param Workspace $workspace The workspace to invalidate limit cache for
-     * @param array<string> $featureCodes Specific features (empty = all limit caches)
+     * @param  Workspace  $workspace  The workspace to invalidate limit cache for
+     * @param  array<string>  $featureCodes  Specific features (empty = all limit caches)
      */
     public function invalidateLimitCache(Workspace $workspace, array $featureCodes = []): void
     {
@@ -1444,7 +1432,7 @@ class EntitlementService
      * }
      * ```
      *
-     * @param Workspace $workspace The workspace to expire boosts for
+     * @param  Workspace  $workspace  The workspace to expire boosts for
      */
     public function expireCycleBoundBoosts(Workspace $workspace): void
     {
@@ -1489,9 +1477,8 @@ class EntitlementService
      * Does not include workspace-level entitlements (that cascade is handled
      * by `canForNamespace()`).
      *
-     * @param Namespace_ $namespace The namespace to calculate limits for
-     * @param string $featureCode The feature code to get the limit for
-     *
+     * @param  Namespace_  $namespace  The namespace to calculate limits for
+     * @param  string  $featureCode  The feature code to get the limit for
      * @return int|null Returns:
      *                  - `null` if the feature is not included in any namespace package
      *                  - `-1` if the feature is unlimited
@@ -1579,10 +1566,9 @@ class EntitlementService
      * The time window for calculation follows the same rules based on feature
      * reset configuration.
      *
-     * @param Namespace_ $namespace The namespace to get usage for
-     * @param string $featureCode The feature code to get usage for
-     * @param Feature $feature The feature model (for reset configuration)
-     *
+     * @param  Namespace_  $namespace  The namespace to get usage for
+     * @param  string  $featureCode  The feature code to get usage for
+     * @param  Feature  $feature  The feature model (for reset configuration)
      * @return int The current usage count for the namespace
      */
     protected function getNamespaceCurrentUsage(Namespace_ $namespace, string $featureCode, Feature $feature): int
@@ -1652,8 +1638,7 @@ class EntitlementService
      * }
      * ```
      *
-     * @param Namespace_ $namespace The namespace to get the summary for
-     *
+     * @param  Namespace_  $namespace  The namespace to get the summary for
      * @return Collection<string, Collection<int, array{
      *     feature: Feature,
      *     code: string,
@@ -1737,8 +1722,8 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Namespace_ $namespace The namespace to provision the package for
-     * @param string $packageCode The unique code of the package to provision
+     * @param  Namespace_  $namespace  The namespace to provision the package for
+     * @param  string  $packageCode  The unique code of the package to provision
      * @param array{
      *     starts_at?: \DateTimeInterface,
      *     expires_at?: \DateTimeInterface|null,
@@ -1749,7 +1734,6 @@ class EntitlementService
      *     - `expires_at`: When the package expires (null for indefinite)
      *     - `billing_cycle_anchor`: Date for monthly usage resets
      *     - `metadata`: Additional data to store with the package
-     *
      * @return NamespacePackage The created namespace package record
      *
      * @throws ModelNotFoundException If the package code does not exist
@@ -1837,8 +1821,8 @@ class EntitlementService
      * );
      * ```
      *
-     * @param Namespace_ $namespace The namespace to provision the boost for
-     * @param string $featureCode The feature code to boost
+     * @param  Namespace_  $namespace  The namespace to provision the boost for
+     * @param  string  $featureCode  The feature code to boost
      * @param array{
      *     boost_type?: string,
      *     duration_type?: string,
@@ -1853,7 +1837,6 @@ class EntitlementService
      *     - `starts_at`: When the boost becomes active (default: now)
      *     - `expires_at`: When the boost expires
      *     - `metadata`: Additional data to store
-     *
      * @return Boost The created boost record
      *
      * @see self::provisionBoost() For workspace-level boost provisioning
@@ -1911,9 +1894,9 @@ class EntitlementService
      * $entitlementService->invalidateNamespaceCache($namespace);
      * ```
      *
-     * @param Namespace_ $namespace The namespace to invalidate caches for
-     * @param array<string> $featureCodes Specific features to invalidate (empty = all)
-     * @param string $reason The reason for invalidation (for event dispatch)
+     * @param  Namespace_  $namespace  The namespace to invalidate caches for
+     * @param  array<string>  $featureCodes  Specific features to invalidate (empty = all)
+     * @param  string  $reason  The reason for invalidation (for event dispatch)
      *
      * @see self::invalidateCache() For workspace-level cache invalidation
      */
@@ -1941,8 +1924,8 @@ class EntitlementService
     /**
      * Invalidate namespace cache using cache tags (O(1) operation).
      *
-     * @param Namespace_ $namespace The namespace to invalidate
-     * @param array<string> $featureCodes Specific features (empty = all)
+     * @param  Namespace_  $namespace  The namespace to invalidate
+     * @param  array<string>  $featureCodes  Specific features (empty = all)
      */
     protected function invalidateNamespaceCacheWithTags(Namespace_ $namespace, array $featureCodes = []): void
     {
@@ -1971,8 +1954,8 @@ class EntitlementService
      * This is O(n) where n = number of features when no specific features
      * are provided.
      *
-     * @param Namespace_ $namespace The namespace to invalidate
-     * @param array<string> $featureCodes Specific features (empty = all)
+     * @param  Namespace_  $namespace  The namespace to invalidate
+     * @param  array<string>  $featureCodes  Specific features (empty = all)
      */
     protected function invalidateNamespaceCacheWithoutTags(Namespace_ $namespace, array $featureCodes = []): void
     {
@@ -1993,8 +1976,8 @@ class EntitlementService
      * Use this for performance when only usage has changed (e.g., after recording
      * usage) and limits are known to be unchanged.
      *
-     * @param Namespace_ $namespace The namespace to invalidate usage cache for
-     * @param string $featureCode The specific feature code to invalidate
+     * @param  Namespace_  $namespace  The namespace to invalidate usage cache for
+     * @param  string  $featureCode  The specific feature code to invalidate
      */
     public function invalidateNamespaceUsageCache(Namespace_ $namespace, string $featureCode): void
     {

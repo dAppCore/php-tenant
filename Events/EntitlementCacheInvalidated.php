@@ -59,10 +59,10 @@ class EntitlementCacheInvalidated
     /**
      * Create a new event instance.
      *
-     * @param Workspace|null $workspace The affected workspace (null for namespace-only invalidation)
-     * @param Namespace_|null $namespace The affected namespace (null for workspace-only invalidation)
-     * @param array<string> $featureCodes Specific feature codes invalidated (empty = all features)
-     * @param string $reason The reason for invalidation
+     * @param  Workspace|null  $workspace  The affected workspace (null for namespace-only invalidation)
+     * @param  Namespace_|null  $namespace  The affected namespace (null for workspace-only invalidation)
+     * @param  array<string>  $featureCodes  Specific feature codes invalidated (empty = all features)
+     * @param  string  $reason  The reason for invalidation
      */
     public function __construct(
         public readonly ?Workspace $workspace,
@@ -74,9 +74,9 @@ class EntitlementCacheInvalidated
     /**
      * Create an event for workspace cache invalidation.
      *
-     * @param Workspace $workspace The workspace whose cache was invalidated
-     * @param array<string> $featureCodes Specific feature codes (empty = all)
-     * @param string $reason The reason for invalidation
+     * @param  Workspace  $workspace  The workspace whose cache was invalidated
+     * @param  array<string>  $featureCodes  Specific feature codes (empty = all)
+     * @param  string  $reason  The reason for invalidation
      */
     public static function forWorkspace(
         Workspace $workspace,
@@ -89,9 +89,9 @@ class EntitlementCacheInvalidated
     /**
      * Create an event for namespace cache invalidation.
      *
-     * @param Namespace_ $namespace The namespace whose cache was invalidated
-     * @param array<string> $featureCodes Specific feature codes (empty = all)
-     * @param string $reason The reason for invalidation
+     * @param  Namespace_  $namespace  The namespace whose cache was invalidated
+     * @param  array<string>  $featureCodes  Specific feature codes (empty = all)
+     * @param  string  $reason  The reason for invalidation
      */
     public static function forNamespace(
         Namespace_ $namespace,

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Core\Tenant\Controllers;
 
 use Core\Front\Controller;
+use Core\Tenant\Models\User;
+use Core\Tenant\Models\Workspace;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Mod\Api\Controllers\Concerns\HasApiResponses;
 use Mod\Api\Controllers\Concerns\ResolvesWorkspace;
 use Mod\Api\Resources\PaginatedCollection;
 use Mod\Api\Resources\WorkspaceResource;
-use Core\Tenant\Models\User;
-use Core\Tenant\Models\Workspace;
 
 /**
  * Workspace API controller.

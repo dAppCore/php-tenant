@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Tests\Feature;
 
-use Core\Tenant\Database\Factories\WorkspaceInvitationFactory;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspaceInvitation;

@@ -73,7 +73,7 @@ class HashInvitationTokens extends Command
 
         $this->info("Found {$records->count()} invitation records in scope.");
         $this->info("Already hashed: {$alreadyHashed}");
-        $this->info("Need migration: ".count($toMigrate));
+        $this->info('Need migration: '.count($toMigrate));
 
         if (empty($toMigrate)) {
             $this->info('All tokens are already hashed. Nothing to do.');
@@ -86,7 +86,7 @@ class HashInvitationTokens extends Command
         $nonPendingCount = count($toMigrate) - $pendingCount;
 
         $this->newLine();
-        $this->warn("IMPORTANT: Hashing tokens is a one-way operation!");
+        $this->warn('IMPORTANT: Hashing tokens is a one-way operation!');
         $this->warn("- Pending invitations ({$pendingCount}): Links will STOP working");
         $this->warn("- Expired/Accepted ({$nonPendingCount}): Safe to hash");
 

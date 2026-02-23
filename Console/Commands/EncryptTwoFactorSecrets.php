@@ -54,7 +54,7 @@ class EncryptTwoFactorSecrets extends Command
 
         $this->info("Found {$records->count()} 2FA records total.");
         $this->info("Already encrypted: {$alreadyEncrypted}");
-        $this->info("Need migration: ".count($toMigrate));
+        $this->info('Need migration: '.count($toMigrate));
 
         if (empty($toMigrate)) {
             $this->info('All secrets are already encrypted. Nothing to do.');

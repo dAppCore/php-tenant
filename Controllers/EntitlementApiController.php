@@ -6,17 +6,16 @@ namespace Core\Tenant\Controllers;
 
 use Core\Api\RateLimit\RateLimit;
 use Core\Front\Controller;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Core\Tenant\Models\EntitlementLog;
 use Core\Tenant\Models\Package;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspacePackage;
 use Core\Tenant\Services\EntitlementService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * API controller for entitlement management.
