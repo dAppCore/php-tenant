@@ -1,5 +1,5 @@
 {
-    "name": "host-uk/core-tenant",
+    "name": "core/php-tenant",
     "description": "Multi-tenancy and workspaces for Laravel",
     "keywords": [
         "multi-tenant",
@@ -9,7 +9,7 @@
     "license": "EUPL-1.2",
     "require": {
         "php": "^8.2",
-        "host-uk/core": "dev-main"
+        "core/php-framework": "dev-main"
     },
     "require-dev": {
         "laravel/pint": "^1.18",
