@@ -1,7 +1,7 @@
 # Core Tenant
 
-[![CI](https://github.com/host-uk/core-tenant/actions/workflows/ci.yml/badge.svg)](https://github.com/host-uk/core-tenant/actions/workflows/ci.yml)
-[![PHP Version](https://img.shields.io/packagist/php-v/host-uk/core-tenant)](https://packagist.org/packages/host-uk/core-tenant)
+[![CI](https://github.com/lthn/php-tenant/actions/workflows/ci.yml/badge.svg)](https://github.com/lthn/php-tenant/actions/workflows/ci.yml)
+[![PHP Version](https://img.shields.io/packagist/php-v/lthn/php-tenant)](https://packagist.org/packages/lthn/php-tenant)
 [![Laravel](https://img.shields.io/badge/Laravel-11.x%20%7C%2012.x-FF2D20?logo=laravel)](https://laravel.com)
 [![License](https://img.shields.io/badge/License-EUPL--1.2-blue.svg)](LICENSE)
 
@@ -20,12 +20,12 @@ Multi-tenancy module for the Core PHP Framework providing users, workspaces, and
 
 - PHP 8.2+
 - Laravel 11.x or 12.x
-- Core PHP Framework (`host-uk/core`)
+- Core PHP Framework (`lthn/php`)
 
 ## Installation
 
 ```bash
-composer require host-uk/core-tenant
+composer require lthn/php-tenant
 ```
 
 The service provider will be auto-discovered.
