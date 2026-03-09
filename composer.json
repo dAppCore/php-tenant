@@ -9,7 +9,7 @@
     "license": "EUPL-1.2",
     "require": {
         "php": "^8.2",
-        "core/php-framework": "dev-main"
+        "core/php": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.18",
@@ -50,7 +50,7 @@
         {
             "name": "core",
             "type": "path",
-            "url": "../php-framework"
+            "url": "../php"
         }
     ]
 }
