@@ -36,13 +36,17 @@ Routes, views, commands, and Livewire components register only when their events
 
 | Service | Purpose |
 |---------|---------|
-| `WorkspaceManager` | Current workspace context |
+| `WorkspaceManager` | Current workspace context (set/get via request attributes) |
 | `WorkspaceService` | Workspace CRUD, session switching |
+| `WorkspaceTeamService` | Team management within workspaces |
 | `EntitlementService` | Feature access, package limits, usage |
 | `EntitlementWebhookService` | Webhook delivery with circuit breaker |
 | `WorkspaceCacheManager` | Workspace-scoped caching with tags |
 | `UsageAlertService` | Usage threshold alerts |
+| `UserStatsService` | User statistics aggregation |
 | `TotpService` | 2FA TOTP generation/validation |
+| `NamespaceService` | Namespace CRUD operations |
+| `NamespaceManager` | Namespace context resolution |
 
 ### Workspace Isolation
 
@@ -51,23 +55,43 @@ The `BelongsToWorkspace` trait enforces tenancy:
 - Throws `MissingWorkspaceContextException` if no workspace context
 - Provides `forWorkspaceCached()` and `ownedByCurrentWorkspaceCached()` query methods
 - Auto-invalidates workspace cache on model save/delete
+- Strict mode can be opted out per-model with `$workspaceContextRequired = false`
 
-### Entitlement System
+### Entitlement Cascade
 
 Features have types: `boolean`, `limit`, `unlimited`. Usage is tracked via `UsageRecord` with rolling window or monthly resets. Packages bundle features. Boosts provide temporary limit increases.
 
+When checking namespace entitlements, priority is:
+1. Namespace-level packages/boosts (most specific)
+2. Workspace-level packages/boosts
+3. User tier entitlements (for user-owned namespaces without workspace)
+
+### Backward Compatibility
+
+`Boot.php` registers class aliases (`App\Services\WorkspaceManager` etc.) for backward compat with code that uses the old `App\Services\` namespace.
+
 ## Coding Standards
 
-- **UK English**: colour, organisation, centre (not American spellings)
+- **UK English**: colour, organisation, centre, behaviour, licence (noun) / license (verb)
 - **Strict types**: `declare(strict_types=1);` in every file
 - **Type hints**: All parameters and return types
 - **Pest**: Write tests using Pest, not PHPUnit syntax
 - **Flux Pro**: Use Flux components, not vanilla Alpine
 - **Font Awesome**: Use FA icons, not Heroicons
 
+### Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Model | Singular PascalCase | `Workspace` |
+| Table | Plural snake_case | `workspaces` |
+| Controller | `{Model}Controller` | `WorkspaceController` |
+| Livewire Page | `{Feature}Page` | `WorkspaceHome` |
+| Livewire Modal | `{Feature}Modal` | `EntitlementWebhookManager` |
+
 ## Testing
 
-Uses Pest with Orchestra Testbench. Tests are in `tests/Feature/`.
+Uses Pest with Orchestra Testbench (in-memory SQLite). Tests are in `tests/Feature/`. The base `TestCase` registers `Core\Tenant\Boot` as the package provider.
 
 ```php
 it('displays the workspace home', function () {
