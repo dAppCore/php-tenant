@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\View\Modal\Web;
 
 use Core\Tenant\Models\AccountDeletionRequest;

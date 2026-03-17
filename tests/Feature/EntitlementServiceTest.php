@@ -15,9 +15,11 @@ use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspacePackage;
 use Core\Tenant\Services\EntitlementResult;
 use Core\Tenant\Services\EntitlementService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Clear cache before each test
@@ -426,7 +428,7 @@ describe('EntitlementService', function () {
 
             $summary = $this->service->getUsageSummary($this->workspace);
 
-            expect($summary)->toBeInstanceOf(\Illuminate\Support\Collection::class)
+            expect($summary)->toBeInstanceOf(Collection::class)
                 ->and($summary->has('ai'))->toBeTrue()
                 ->and($summary->has('tier'))->toBeTrue()
                 ->and($summary->has('social'))->toBeTrue();
@@ -1101,7 +1103,7 @@ describe('Namespace Entitlements', function () {
 
             $summary = $this->service->getNamespaceUsageSummary($this->userNamespace);
 
-            expect($summary)->toBeInstanceOf(\Illuminate\Support\Collection::class)
+            expect($summary)->toBeInstanceOf(Collection::class)
                 ->and($summary->has('content'))->toBeTrue()
                 ->and($summary->has('features'))->toBeTrue();
         });

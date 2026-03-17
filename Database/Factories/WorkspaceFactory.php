@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Database\Factories;
 
 use Core\Tenant\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Tenant\Models\Workspace>
+ * @extends Factory<Workspace>
  */
 class WorkspaceFactory extends Factory
 {

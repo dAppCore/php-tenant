@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Database\Seeders;
 
+use Core\Mod\Web\Models\Page;
 use Core\Tenant\Models\Package;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
@@ -94,11 +97,11 @@ class DemoTestUserSeeder extends Seeder
     protected function createTestBioPage(Workspace $workspace, User $user): void
     {
         // Only create if Web Page model exists and no test page exists
-        if (! class_exists(\Core\Mod\Web\Models\Page::class)) {
+        if (! class_exists(Page::class)) {
             return;
         }
 
-        $existingPage = \Core\Mod\Web\Models\Page::where('workspace_id', $workspace->id)
+        $existingPage = Page::where('workspace_id', $workspace->id)
             ->where('url', 'nyx-test')
             ->first();
 
@@ -106,7 +109,7 @@ class DemoTestUserSeeder extends Seeder
             return;
         }
 
-        \Core\Mod\Web\Models\Page::create([
+        Page::create([
             'workspace_id' => $workspace->id,
             'user_id' => $user->id,
             'url' => 'nyx-test',
@@ -146,11 +149,11 @@ class DemoTestUserSeeder extends Seeder
     protected function createTestShortLink(Workspace $workspace, User $user): void
     {
         // Only create if Web Page model exists
-        if (! class_exists(\Core\Mod\Web\Models\Page::class)) {
+        if (! class_exists(Page::class)) {
             return;
         }
 
-        $existingLink = \Core\Mod\Web\Models\Page::where('workspace_id', $workspace->id)
+        $existingLink = Page::where('workspace_id', $workspace->id)
             ->where('url', 'nyx-short')
             ->first();
 
@@ -158,7 +161,7 @@ class DemoTestUserSeeder extends Seeder
             return;
         }
 
-        \Core\Mod\Web\Models\Page::create([
+        Page::create([
             'workspace_id' => $workspace->id,
             'user_id' => $user->id,
             'url' => 'nyx-short',

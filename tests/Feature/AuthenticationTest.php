@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Tests\Feature;
 
 use Core\Tenant\Models\User;

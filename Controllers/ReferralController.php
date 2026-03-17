@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Controllers;
 
+use Core\Front\Controller;
 use Core\Helpers\PrivacyHelper;
 use Core\Mod\Trees\Models\TreePlanting;
 use Core\Mod\Trees\Models\TreePlantingStats;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Cookie;
  *
  * On signup, PlantTreeForAgentReferral listener plants a tree for the referrer.
  */
-class ReferralController extends \Core\Front\Controller
+class ReferralController extends Controller
 {
     /**
      * Cookie name for agent referral tracking.

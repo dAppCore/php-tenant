@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Core\Tenant\View\Modal\Admin\MemberManager;
+use Core\Tenant\View\Modal\Admin\TeamManager;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,10 +17,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.domain'])->prefix('admin/tenant')->name('hub.admin.tenant.')->group(function () {
     // Team Manager
-    Route::get('/teams', \Core\Tenant\View\Modal\Admin\TeamManager::class)
+    Route::get('/teams', TeamManager::class)
         ->name('teams');
 
     // Member Manager
-    Route::get('/members', \Core\Tenant\View\Modal\Admin\MemberManager::class)
+    Route::get('/members', MemberManager::class)
         ->name('members');
 });

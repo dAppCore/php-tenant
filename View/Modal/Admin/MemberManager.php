@@ -7,7 +7,9 @@ namespace Core\Tenant\View\Modal\Admin;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspaceMember;
 use Core\Tenant\Models\WorkspaceTeam;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -287,7 +289,7 @@ class MemberManager extends Component
     // ─────────────────────────────────────────────────────────────────────────
 
     #[Computed]
-    public function members(): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function members(): LengthAwarePaginator
     {
         return WorkspaceMember::query()
             ->with(['user', 'workspace', 'team', 'inviter'])
@@ -308,13 +310,13 @@ class MemberManager extends Component
     }
 
     #[Computed]
-    public function workspaces(): \Illuminate\Database\Eloquent\Collection
+    public function workspaces(): Collection
     {
         return Workspace::orderBy('name')->get();
     }
 
     #[Computed]
-    public function teamsForFilter(): \Illuminate\Database\Eloquent\Collection
+    public function teamsForFilter(): Collection
     {
         $query = WorkspaceTeam::query();
 
@@ -326,7 +328,7 @@ class MemberManager extends Component
     }
 
     #[Computed]
-    public function teamsForAssignment(): \Illuminate\Database\Eloquent\Collection
+    public function teamsForAssignment(): Collection
     {
         if ($this->assignMemberId) {
             $member = WorkspaceMember::find($this->assignMemberId);
@@ -337,11 +339,11 @@ class MemberManager extends Component
             }
         }
 
-        return new \Illuminate\Database\Eloquent\Collection;
+        return new Collection;
     }
 
     #[Computed]
-    public function teamsForBulkAssignment(): \Illuminate\Database\Eloquent\Collection
+    public function teamsForBulkAssignment(): Collection
     {
         // Only show teams from the current workspace filter
         if ($this->workspaceFilter) {
@@ -350,7 +352,7 @@ class MemberManager extends Component
                 ->get();
         }
 
-        return new \Illuminate\Database\Eloquent\Collection;
+        return new Collection;
     }
 
     #[Computed]

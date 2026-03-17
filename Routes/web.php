@@ -8,6 +8,7 @@ declare(strict_types=1);
  * Account management and workspace routes.
  */
 
+use Core\Tenant\Controllers\WorkspaceInvitationController;
 use Core\Tenant\View\Modal\Web\CancelDeletion;
 use Core\Tenant\View\Modal\Web\ConfirmDeletion;
 use Core\Tenant\View\Modal\Web\WorkspaceHome;
@@ -41,7 +42,7 @@ Route::prefix('account')->name('account.')->group(function () {
 |
 */
 
-Route::get('/workspace/invitation/{token}', \Core\Tenant\Controllers\WorkspaceInvitationController::class)
+Route::get('/workspace/invitation/{token}', WorkspaceInvitationController::class)
     ->name('workspace.invitation.accept');
 
 /*

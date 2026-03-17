@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\UserTwoFactorAuth;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     Cache::flush();
@@ -15,7 +19,7 @@ describe('TwoFactorAuthenticatable Trait', function () {
     describe('twoFactorAuth() relationship', function () {
         it('returns HasOne relationship', function () {
             expect($this->user->twoFactorAuth())->toBeInstanceOf(
-                \Illuminate\Database\Eloquent\Relations\HasOne::class
+                HasOne::class
             );
         });
 
@@ -315,7 +319,7 @@ describe('UserTwoFactorAuth Model', function () {
             'recovery_codes' => $codes,
         ]);
 
-        expect($twoFactorAuth->recovery_codes)->toBeInstanceOf(\Illuminate\Support\Collection::class)
+        expect($twoFactorAuth->recovery_codes)->toBeInstanceOf(Collection::class)
             ->and($twoFactorAuth->recovery_codes->toArray())->toBe($codes);
     });
 
@@ -329,7 +333,7 @@ describe('UserTwoFactorAuth Model', function () {
             'confirmed_at' => $confirmedAt,
         ]);
 
-        expect($twoFactorAuth->confirmed_at)->toBeInstanceOf(\Carbon\Carbon::class);
+        expect($twoFactorAuth->confirmed_at)->toBeInstanceOf(Carbon::class);
     });
 
     it('encrypts secret at rest', function () {
@@ -348,7 +352,7 @@ describe('UserTwoFactorAuth Model', function () {
 
         // But the raw database value should be encrypted (base64 JSON with iv, value, mac)
         // Note: DB column is 'secret', not 'secret_key'
-        $rawValue = \Illuminate\Support\Facades\DB::table('user_two_factor_auth')
+        $rawValue = DB::table('user_two_factor_auth')
             ->where('id', $twoFactorAuth->id)
             ->value('secret');
 
@@ -372,7 +376,7 @@ describe('UserTwoFactorAuth Model', function () {
         expect($twoFactorAuth->recovery_codes->toArray())->toBe($codes);
 
         // But the raw database value should be encrypted
-        $rawValue = \Illuminate\Support\Facades\DB::table('user_two_factor_auth')
+        $rawValue = DB::table('user_two_factor_auth')
             ->where('id', $twoFactorAuth->id)
             ->value('recovery_codes');
 

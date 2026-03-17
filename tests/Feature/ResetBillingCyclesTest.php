@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Core\Tenant\Models\Boost;
 use Core\Tenant\Models\EntitlementLog;
 use Core\Tenant\Models\Feature;
@@ -9,10 +11,11 @@ use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Core\Tenant\Notifications\BoostExpiredNotification;
 use Core\Tenant\Services\EntitlementService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Cache::flush();

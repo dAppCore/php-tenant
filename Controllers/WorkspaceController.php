@@ -9,6 +9,8 @@ use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Mod\Api\Controllers\Concerns\HasApiResponses;
 use Mod\Api\Controllers\Concerns\ResolvesWorkspace;
 use Mod\Api\Resources\PaginatedCollection;
@@ -133,7 +135,7 @@ class WorkspaceController extends Controller
 
         // Generate slug if not provided
         if (empty($validated['slug'])) {
-            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']).'-'.\Illuminate\Support\Str::random(6);
+            $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(6);
         }
 
         // Set default domain
@@ -252,9 +254,9 @@ class WorkspaceController extends Controller
 
         // Use a single transaction with optimised query:
         // Clear all defaults and set the new one in one operation using raw update
-        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $workspace) {
+        DB::transaction(function () use ($user, $workspace) {
             // Clear all existing defaults for this user's hub workspaces
-            \Illuminate\Support\Facades\DB::table('user_workspace')
+            DB::table('user_workspace')
                 ->where('user_id', $user->id)
                 ->whereIn('workspace_id', function ($query) {
                     $query->select('id')
@@ -264,7 +266,7 @@ class WorkspaceController extends Controller
                 ->update(['is_default' => false]);
 
             // Set the new default
-            \Illuminate\Support\Facades\DB::table('user_workspace')
+            DB::table('user_workspace')
                 ->where('user_id', $user->id)
                 ->where('workspace_id', $workspace->id)
                 ->update(['is_default' => true]);

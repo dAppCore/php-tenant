@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
+use Core\Mod\Api\Guards\AccessTokenGuard;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\UserToken;
+use Illuminate\Http\Request;
 
 test('can authenticate with valid bearer token', function () {
     $user = User::factory()->create();
     $result = $user->createToken('Test Token');
 
     // Test the guard directly by invoking it with a mock request
-    $guard = new \Core\Mod\Api\Guards\AccessTokenGuard(app('auth'));
-    $request = \Illuminate\Http\Request::create('/test', 'GET');
+    $guard = new AccessTokenGuard(app('auth'));
+    $request = Request::create('/test', 'GET');
     $request->headers->set('Authorization', "Bearer {$result['token']}");
 
     $authenticatedUser = $guard($request);
@@ -57,8 +59,8 @@ test('token last_used_at is updated on successful authentication', function () {
     expect($tokenModel->last_used_at)->toBeNull();
 
     // Test the guard directly by invoking it with a mock request
-    $guard = new \Core\Mod\Api\Guards\AccessTokenGuard(app('auth'));
-    $request = \Illuminate\Http\Request::create('/test', 'GET');
+    $guard = new AccessTokenGuard(app('auth'));
+    $request = Request::create('/test', 'GET');
     $request->headers->set('Authorization', "Bearer {$result['token']}");
 
     $guard($request);

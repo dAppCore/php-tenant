@@ -4,10 +4,20 @@ declare(strict_types=1);
 
 namespace Core\Tenant;
 
+use App\Services\UserStatsService;
+use App\Services\WorkspaceCacheManager;
+use App\Services\WorkspaceManager;
+use App\Services\WorkspaceService;
 use Core\Events\AdminPanelBooting;
 use Core\Events\ApiRoutesRegistering;
 use Core\Events\ConsoleBooting;
 use Core\Events\WebRoutesRegistering;
+use Core\Tenant\Contracts\TwoFactorAuthenticationProvider;
+use Core\Tenant\Services\EntitlementService;
+use Core\Tenant\Services\EntitlementWebhookService;
+use Core\Tenant\Services\TotpService;
+use Core\Tenant\Services\UsageAlertService;
+use Core\Tenant\Services\WorkspaceTeamService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,48 +50,48 @@ class Boot extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(
-            \Core\Tenant\Contracts\TwoFactorAuthenticationProvider::class,
-            \Core\Tenant\Services\TotpService::class
+            TwoFactorAuthenticationProvider::class,
+            TotpService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\EntitlementService::class,
-            \Core\Tenant\Services\EntitlementService::class
+            EntitlementService::class,
+            EntitlementService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\WorkspaceManager::class,
-            \Core\Tenant\Services\WorkspaceManager::class
+            Services\WorkspaceManager::class,
+            Services\WorkspaceManager::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\UserStatsService::class,
-            \Core\Tenant\Services\UserStatsService::class
+            Services\UserStatsService::class,
+            Services\UserStatsService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\WorkspaceService::class,
-            \Core\Tenant\Services\WorkspaceService::class
+            Services\WorkspaceService::class,
+            Services\WorkspaceService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\WorkspaceCacheManager::class,
-            \Core\Tenant\Services\WorkspaceCacheManager::class
+            Services\WorkspaceCacheManager::class,
+            Services\WorkspaceCacheManager::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\UsageAlertService::class,
-            \Core\Tenant\Services\UsageAlertService::class
+            UsageAlertService::class,
+            UsageAlertService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\EntitlementWebhookService::class,
-            \Core\Tenant\Services\EntitlementWebhookService::class
+            EntitlementWebhookService::class,
+            EntitlementWebhookService::class
         );
 
         $this->app->singleton(
-            \Core\Tenant\Services\WorkspaceTeamService::class,
-            \Core\Tenant\Services\WorkspaceTeamService::class
+            WorkspaceTeamService::class,
+            WorkspaceTeamService::class
         );
 
         $this->registerBackwardCompatAliases();
@@ -89,31 +99,31 @@ class Boot extends ServiceProvider
 
     protected function registerBackwardCompatAliases(): void
     {
-        if (! class_exists(\App\Services\WorkspaceManager::class)) {
+        if (! class_exists(WorkspaceManager::class)) {
             class_alias(
-                \Core\Tenant\Services\WorkspaceManager::class,
-                \App\Services\WorkspaceManager::class
+                Services\WorkspaceManager::class,
+                WorkspaceManager::class
             );
         }
 
-        if (! class_exists(\App\Services\UserStatsService::class)) {
+        if (! class_exists(UserStatsService::class)) {
             class_alias(
-                \Core\Tenant\Services\UserStatsService::class,
-                \App\Services\UserStatsService::class
+                Services\UserStatsService::class,
+                UserStatsService::class
             );
         }
 
-        if (! class_exists(\App\Services\WorkspaceService::class)) {
+        if (! class_exists(WorkspaceService::class)) {
             class_alias(
-                \Core\Tenant\Services\WorkspaceService::class,
-                \App\Services\WorkspaceService::class
+                Services\WorkspaceService::class,
+                WorkspaceService::class
             );
         }
 
-        if (! class_exists(\App\Services\WorkspaceCacheManager::class)) {
+        if (! class_exists(WorkspaceCacheManager::class)) {
             class_alias(
-                \Core\Tenant\Services\WorkspaceCacheManager::class,
-                \App\Services\WorkspaceCacheManager::class
+                Services\WorkspaceCacheManager::class,
+                WorkspaceCacheManager::class
             );
         }
     }

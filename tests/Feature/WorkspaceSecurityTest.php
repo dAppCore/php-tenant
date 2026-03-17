@@ -14,6 +14,7 @@ use Core\Tenant\Scopes\WorkspaceScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -208,7 +209,7 @@ class WorkspaceSecurityTest extends TestCase
         $this->expectExceptionMessage('create');
 
         Account::create([
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'provider' => 'twitter',
             'provider_id' => '12345',
             'name' => 'Test Account',
@@ -223,7 +224,7 @@ class WorkspaceSecurityTest extends TestCase
 
         // Should succeed because workspace_id is explicitly provided
         $account = Account::create([
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'workspace_id' => $this->workspace->id,
             'provider' => 'twitter',
             'provider_id' => '12345',
@@ -240,7 +241,7 @@ class WorkspaceSecurityTest extends TestCase
         request()->attributes->set('workspace_model', $this->workspace);
 
         $account = Account::create([
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'provider' => 'twitter',
             'provider_id' => '12345',
             'name' => 'Test Account',

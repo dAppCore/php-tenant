@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use Core\Tenant\Database\Factories\UserTokenFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,9 +19,9 @@ class UserToken extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): \Core\Tenant\Database\Factories\UserTokenFactory
+    protected static function newFactory(): UserTokenFactory
     {
-        return \Core\Tenant\Database\Factories\UserTokenFactory::new();
+        return UserTokenFactory::new();
     }
 
     /**

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Core\Api\RateLimit\RateLimit;
+use Core\Tenant\Controllers\EntitlementApiController;
 use Core\Tenant\Models\EntitlementLog;
 use Core\Tenant\Models\Feature;
 use Core\Tenant\Models\Package;
@@ -10,10 +12,11 @@ use Core\Tenant\Models\Workspace;
 use Core\Tenant\Models\WorkspacePackage;
 use Core\Tenant\Services\EntitlementService;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Cache::flush();
@@ -1076,8 +1079,8 @@ describe('Error Response Format', function () {
 
 describe('Rate Limiting', function () {
     it('controller has rate limit attribute', function () {
-        $reflection = new \ReflectionClass(\Core\Tenant\Controllers\EntitlementApiController::class);
-        $attributes = $reflection->getAttributes(\Core\Api\RateLimit\RateLimit::class);
+        $reflection = new ReflectionClass(EntitlementApiController::class);
+        $attributes = $reflection->getAttributes(RateLimit::class);
 
         expect($attributes)->toHaveCount(1);
 
