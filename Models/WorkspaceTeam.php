@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use Carbon\Carbon;
 use Core\Tenant\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,8 +27,8 @@ use Illuminate\Support\Str;
  * @property bool $is_system
  * @property string $colour
  * @property int $sort_order
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class WorkspaceTeam extends Model
 {

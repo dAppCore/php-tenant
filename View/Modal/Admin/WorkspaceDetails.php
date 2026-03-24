@@ -1,9 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\View\Modal\Admin;
 
+use Carbon\Carbon;
+use Core\Mod\Analytics\Models\Website;
+use Core\Mod\Api\Models\ApiKey;
+use Core\Mod\Content\Models\ContentItem;
+use Core\Mod\Notify\Models\PushWebsite;
+use Core\Mod\Social\Models\Account;
+use Core\Mod\Social\Models\Post;
+use Core\Mod\Trust\Models\Campaign;
+use Core\Mod\Web\Models\Page;
+use Core\Mod\Web\Models\Project;
+use Core\Tenant\Models\Boost;
+use Core\Tenant\Models\EntitlementLog;
+use Core\Tenant\Models\Feature;
+use Core\Tenant\Models\Package;
+use Core\Tenant\Models\UsageRecord;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
+use Core\Tenant\Models\WorkspacePackage;
+use Core\Tenant\Services\EntitlementService;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -87,18 +107,18 @@ class WorkspaceDetails extends Component
     public function resourceCounts(): array
     {
         $counts = [];
-        $schema = \Illuminate\Support\Facades\Schema::getFacadeRoot();
+        $schema = Schema::getFacadeRoot();
 
         $resources = [
-            ['relation' => 'bioPages', 'label' => 'Bio Pages', 'icon' => 'link', 'color' => 'blue', 'model' => \Core\Mod\Web\Models\Page::class],
-            ['relation' => 'bioProjects', 'label' => 'Bio Projects', 'icon' => 'folder', 'color' => 'indigo', 'model' => \Core\Mod\Web\Models\Project::class],
-            ['relation' => 'socialAccounts', 'label' => 'Social Accounts', 'icon' => 'share-nodes', 'color' => 'purple', 'model' => \Core\Mod\Social\Models\Account::class],
-            ['relation' => 'socialPosts', 'label' => 'Social Posts', 'icon' => 'paper-plane', 'color' => 'pink', 'model' => \Core\Mod\Social\Models\Post::class],
-            ['relation' => 'analyticsSites', 'label' => 'Analytics Sites', 'icon' => 'chart-line', 'color' => 'cyan', 'model' => \Core\Mod\Analytics\Models\Website::class],
-            ['relation' => 'trustWidgets', 'label' => 'Trust Campaigns', 'icon' => 'shield-check', 'color' => 'emerald', 'model' => \Core\Mod\Trust\Models\Campaign::class],
-            ['relation' => 'notificationSites', 'label' => 'Notification Sites', 'icon' => 'bell', 'color' => 'amber', 'model' => \Core\Mod\Notify\Models\PushWebsite::class],
-            ['relation' => 'contentItems', 'label' => 'Content Items', 'icon' => 'file-lines', 'color' => 'slate', 'model' => \Core\Mod\Content\Models\ContentItem::class],
-            ['relation' => 'apiKeys', 'label' => 'API Keys', 'icon' => 'key', 'color' => 'rose', 'model' => \Core\Mod\Api\Models\ApiKey::class],
+            ['relation' => 'bioPages', 'label' => 'Bio Pages', 'icon' => 'link', 'color' => 'blue', 'model' => Page::class],
+            ['relation' => 'bioProjects', 'label' => 'Bio Projects', 'icon' => 'folder', 'color' => 'indigo', 'model' => Project::class],
+            ['relation' => 'socialAccounts', 'label' => 'Social Accounts', 'icon' => 'share-nodes', 'color' => 'purple', 'model' => Account::class],
+            ['relation' => 'socialPosts', 'label' => 'Social Posts', 'icon' => 'paper-plane', 'color' => 'pink', 'model' => Post::class],
+            ['relation' => 'analyticsSites', 'label' => 'Analytics Sites', 'icon' => 'chart-line', 'color' => 'cyan', 'model' => Website::class],
+            ['relation' => 'trustWidgets', 'label' => 'Trust Campaigns', 'icon' => 'shield-check', 'color' => 'emerald', 'model' => Campaign::class],
+            ['relation' => 'notificationSites', 'label' => 'Notification Sites', 'icon' => 'bell', 'color' => 'amber', 'model' => PushWebsite::class],
+            ['relation' => 'contentItems', 'label' => 'Content Items', 'icon' => 'file-lines', 'color' => 'slate', 'model' => ContentItem::class],
+            ['relation' => 'apiKeys', 'label' => 'API Keys', 'icon' => 'key', 'color' => 'rose', 'model' => ApiKey::class],
         ];
 
         foreach ($resources as $resource) {
@@ -125,7 +145,7 @@ class WorkspaceDetails extends Component
         $activities = collect();
 
         // Entitlement logs
-        if (class_exists(\Core\Tenant\Models\EntitlementLog::class)) {
+        if (class_exists(EntitlementLog::class)) {
             try {
                 $logs = $this->workspace->entitlementLogs()
                     ->with('user', 'feature')
@@ -147,7 +167,7 @@ class WorkspaceDetails extends Component
         }
 
         // Usage records
-        if (class_exists(\Core\Tenant\Models\UsageRecord::class)) {
+        if (class_exists(UsageRecord::class)) {
             try {
                 $usage = $this->workspace->usageRecords()
                     ->with('user', 'feature')
@@ -325,7 +345,7 @@ class WorkspaceDetails extends Component
     #[Computed]
     public function allPackages()
     {
-        return \Core\Tenant\Models\Package::active()
+        return Package::active()
             ->ordered()
             ->get();
     }
@@ -333,7 +353,7 @@ class WorkspaceDetails extends Component
     #[Computed]
     public function allFeatures()
     {
-        return \Core\Tenant\Models\Feature::active()
+        return Feature::active()
             ->orderBy('category')
             ->orderBy('sort_order')
             ->get();
@@ -403,7 +423,7 @@ class WorkspaceDetails extends Component
     public function resolvedEntitlements()
     {
         try {
-            return app(\Core\Tenant\Services\EntitlementService::class)
+            return app(EntitlementService::class)
                 ->getUsageSummary($this->workspace);
         } catch (\Exception $e) {
             return collect();
@@ -431,7 +451,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        $package = \Core\Tenant\Models\Package::findOrFail($this->selectedPackageId);
+        $package = Package::findOrFail($this->selectedPackageId);
 
         // Check if already assigned
         $existing = $this->workspace->workspacePackages()
@@ -446,7 +466,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        \Core\Tenant\Models\WorkspacePackage::create([
+        WorkspacePackage::create([
             'workspace_id' => $this->workspace->id,
             'package_id' => $package->id,
             'status' => 'active',
@@ -461,7 +481,7 @@ class WorkspaceDetails extends Component
 
     public function removePackage(int $workspacePackageId): void
     {
-        $wp = \Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $packageName = $wp->package?->name ?? 'Package';
@@ -474,7 +494,7 @@ class WorkspaceDetails extends Component
 
     public function suspendPackage(int $workspacePackageId): void
     {
-        $wp = \Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $wp->suspend();
@@ -486,7 +506,7 @@ class WorkspaceDetails extends Component
 
     public function reactivatePackage(int $workspacePackageId): void
     {
-        $wp = \Core\Tenant\Models\WorkspacePackage::where('workspace_id', $this->workspace->id)
+        $wp = WorkspacePackage::where('workspace_id', $this->workspace->id)
             ->findOrFail($workspacePackageId);
 
         $wp->reactivate();
@@ -523,7 +543,7 @@ class WorkspaceDetails extends Component
             return;
         }
 
-        $feature = \Core\Tenant\Models\Feature::where('code', $this->selectedFeatureCode)->first();
+        $feature = Feature::where('code', $this->selectedFeatureCode)->first();
 
         if (! $feature) {
             $this->actionMessage = 'Feature not found.';
@@ -534,26 +554,26 @@ class WorkspaceDetails extends Component
 
         // Map type to boost type constant
         $boostType = match ($this->entitlementType) {
-            'enable' => \Core\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
-            'add_limit' => \Core\Tenant\Models\Boost::BOOST_TYPE_ADD_LIMIT,
-            'unlimited' => \Core\Tenant\Models\Boost::BOOST_TYPE_UNLIMITED,
-            default => \Core\Tenant\Models\Boost::BOOST_TYPE_ENABLE,
+            'enable' => Boost::BOOST_TYPE_ENABLE,
+            'add_limit' => Boost::BOOST_TYPE_ADD_LIMIT,
+            'unlimited' => Boost::BOOST_TYPE_UNLIMITED,
+            default => Boost::BOOST_TYPE_ENABLE,
         };
 
         $durationType = $this->entitlementDuration === 'permanent'
-            ? \Core\Tenant\Models\Boost::DURATION_PERMANENT
-            : \Core\Tenant\Models\Boost::DURATION_DURATION;
+            ? Boost::DURATION_PERMANENT
+            : Boost::DURATION_DURATION;
 
-        \Core\Tenant\Models\Boost::create([
+        Boost::create([
             'workspace_id' => $this->workspace->id,
             'feature_code' => $this->selectedFeatureCode,
             'boost_type' => $boostType,
             'duration_type' => $durationType,
             'limit_value' => $this->entitlementType === 'add_limit' ? $this->entitlementLimit : null,
             'consumed_quantity' => 0,
-            'status' => \Core\Tenant\Models\Boost::STATUS_ACTIVE,
+            'status' => Boost::STATUS_ACTIVE,
             'starts_at' => now(),
-            'expires_at' => $this->entitlementExpiresAt ? \Carbon\Carbon::parse($this->entitlementExpiresAt) : null,
+            'expires_at' => $this->entitlementExpiresAt ? Carbon::parse($this->entitlementExpiresAt) : null,
             'metadata' => ['granted_by' => auth()->id(), 'granted_at' => now()->toDateTimeString()],
         ]);
 
@@ -565,7 +585,7 @@ class WorkspaceDetails extends Component
 
     public function removeBoost(int $boostId): void
     {
-        $boost = \Core\Tenant\Models\Boost::where('workspace_id', $this->workspace->id)
+        $boost = Boost::where('workspace_id', $this->workspace->id)
             ->findOrFail($boostId);
 
         $featureCode = $boost->feature_code;

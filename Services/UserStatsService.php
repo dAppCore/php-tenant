@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\Tenant\Services;
 
 use Core\Tenant\Enums\UserTier;
+use Core\Tenant\Jobs\ComputeUserStats;
 use Core\Tenant\Models\User;
 use Illuminate\Support\Facades\Cache;
 
@@ -44,7 +45,7 @@ class UserStatsService
         // For page loads, return cached data immediately and queue refresh
         if ($user->cached_stats) {
             // Queue background refresh
-            dispatch(new \Core\Tenant\Jobs\ComputeUserStats($user->id))->onQueue('stats');
+            dispatch(new ComputeUserStats($user->id))->onQueue('stats');
 
             return $user->cached_stats;
         }

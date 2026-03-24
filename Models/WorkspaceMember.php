@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,10 +21,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $team_id
  * @property array|null $custom_permissions
  * @property bool $is_default
- * @property \Carbon\Carbon|null $joined_at
+ * @property Carbon|null $joined_at
  * @property int|null $invited_by
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class WorkspaceMember extends Model
 {

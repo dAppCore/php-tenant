@@ -8,7 +8,7 @@ use Core\Tenant\Models\WaitlistEntry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Tenant\Models\WaitlistEntry>
+ * @extends Factory<WaitlistEntry>
  */
 class WaitlistEntryFactory extends Factory
 {

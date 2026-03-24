@@ -17,6 +17,7 @@ use Core\Tenant\Jobs\DispatchEntitlementWebhook;
 use Core\Tenant\Models\EntitlementWebhook;
 use Core\Tenant\Models\EntitlementWebhookDelivery;
 use Core\Tenant\Models\Workspace;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -425,7 +426,7 @@ class EntitlementWebhookService
     /**
      * Get webhooks for a workspace.
      */
-    public function getWebhooksForWorkspace(Workspace $workspace): \Illuminate\Database\Eloquent\Collection
+    public function getWebhooksForWorkspace(Workspace $workspace): Collection
     {
         return EntitlementWebhook::query()
             ->forWorkspace($workspace)
@@ -437,7 +438,7 @@ class EntitlementWebhookService
     /**
      * Get delivery history for a webhook.
      */
-    public function getDeliveryHistory(EntitlementWebhook $webhook, int $limit = 50): \Illuminate\Database\Eloquent\Collection
+    public function getDeliveryHistory(EntitlementWebhook $webhook, int $limit = 50): Collection
     {
         return $webhook->deliveries()
             ->latest('created_at')

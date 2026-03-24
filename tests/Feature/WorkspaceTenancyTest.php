@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Tests\Feature;
 
 use Core\Mod\Analytics\Models\Website;
 use Core\Mod\Social\Models\Account;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -45,12 +49,12 @@ class WorkspaceTenancyTest extends TestCase
         $workspace = Workspace::factory()->create();
 
         // Test that all relationship methods exist and return correct type
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->socialAccounts());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->socialPosts());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->analyticsSites());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->trustWidgets());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->notificationSites());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $workspace->pushCampaigns());
+        $this->assertInstanceOf(HasMany::class, $workspace->socialAccounts());
+        $this->assertInstanceOf(HasMany::class, $workspace->socialPosts());
+        $this->assertInstanceOf(HasMany::class, $workspace->analyticsSites());
+        $this->assertInstanceOf(HasMany::class, $workspace->trustWidgets());
+        $this->assertInstanceOf(HasMany::class, $workspace->notificationSites());
+        $this->assertInstanceOf(HasMany::class, $workspace->pushCampaigns());
         // NOTE: bioPages relationship has been moved to Host UK app's Mod\Bio module
     }
 
@@ -114,7 +118,7 @@ class WorkspaceTenancyTest extends TestCase
         // When creating a model with BelongsToWorkspace trait,
         // it should auto-assign the current user's workspace
         $account = Account::create([
-            'uuid' => \Illuminate\Support\Str::uuid(),
+            'uuid' => Str::uuid(),
             'provider' => 'twitter',
             'provider_id' => '12345',
             'name' => 'Test Account',
