@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Database\Seeders;
 
 use Core\Tenant\Models\Package;

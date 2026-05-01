@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use Core\Tenant\Database\Factories\WorkspaceInvitationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,9 +17,9 @@ class WorkspaceInvitation extends Model
     use HasFactory;
     use Notifiable;
 
-    protected static function newFactory(): \Core\Tenant\Database\Factories\WorkspaceInvitationFactory
+    protected static function newFactory(): WorkspaceInvitationFactory
     {
-        return \Core\Tenant\Database\Factories\WorkspaceInvitationFactory::new();
+        return WorkspaceInvitationFactory::new();
     }
 
     protected $fillable = [

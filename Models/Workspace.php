@@ -4,6 +4,39 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use App\Services\WorkspaceService;
+use Core\Mod\Analytics\Models\AnalyticsGoal;
+use Core\Mod\Analytics\Models\AnalyticsWebsite;
+use Core\Mod\Analytics\Models\Goal;
+use Core\Mod\Analytics\Models\Website;
+use Core\Mod\Api\Models\ApiKey;
+use Core\Mod\Api\Models\WebhookEndpoint;
+use Core\Mod\Content\Models\ContentAuthor;
+use Core\Mod\Content\Models\ContentItem;
+use Core\Mod\Notify\Models\PushCampaign;
+use Core\Mod\Notify\Models\PushFlow;
+use Core\Mod\Notify\Models\PushSegment;
+use Core\Mod\Notify\Models\PushWebsite;
+use Core\Mod\Social\Models\Account;
+use Core\Mod\Social\Models\Analytics;
+use Core\Mod\Social\Models\Audience;
+use Core\Mod\Social\Models\FacebookInsight;
+use Core\Mod\Social\Models\HashtagGroup;
+use Core\Mod\Social\Models\ImportedPost;
+use Core\Mod\Social\Models\InstagramInsight;
+use Core\Mod\Social\Models\Media;
+use Core\Mod\Social\Models\Metric;
+use Core\Mod\Social\Models\PinterestAnalytic;
+use Core\Mod\Social\Models\Post;
+use Core\Mod\Social\Models\PostingSchedule;
+use Core\Mod\Social\Models\Template;
+use Core\Mod\Social\Models\Variable;
+use Core\Mod\Social\Models\Webhook;
+use Core\Mod\Trees\Models\TreePlanting;
+use Core\Mod\Trust\Models\Campaign;
+use Core\Mod\Trust\Models\Notification;
+use Core\Tenant\Database\Factories\WorkspaceFactory;
+use Core\Tenant\Notifications\WorkspaceInvitationNotification;
 use Core\Tenant\Services\EntitlementResult;
 use Core\Tenant\Services\EntitlementService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,14 +44,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
+use Mod\Commerce\Models\Invoice;
+use Mod\Commerce\Models\Order;
+use Mod\Commerce\Models\PaymentMethod;
+use Mod\Commerce\Models\Subscription;
 
 class Workspace extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): \Core\Tenant\Database\Factories\WorkspaceFactory
+    protected static function newFactory(): WorkspaceFactory
     {
-        return \Core\Tenant\Database\Factories\WorkspaceFactory::new();
+        return WorkspaceFactory::new();
     }
 
     protected $fillable = [
@@ -235,7 +273,7 @@ class Workspace extends Model
      */
     public function socialAccounts(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Account::class);
+        return $this->hasMany(Account::class);
     }
 
     /**
@@ -243,7 +281,7 @@ class Workspace extends Model
      */
     public function socialPosts(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Post::class);
+        return $this->hasMany(Post::class);
     }
 
     /**
@@ -251,7 +289,7 @@ class Workspace extends Model
      */
     public function socialTemplates(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Template::class);
+        return $this->hasMany(Template::class);
     }
 
     /**
@@ -259,7 +297,7 @@ class Workspace extends Model
      */
     public function socialMedia(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Media::class);
+        return $this->hasMany(Media::class);
     }
 
     /**
@@ -267,7 +305,7 @@ class Workspace extends Model
      */
     public function socialHashtagGroups(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\HashtagGroup::class);
+        return $this->hasMany(HashtagGroup::class);
     }
 
     /**
@@ -275,7 +313,7 @@ class Workspace extends Model
      */
     public function socialWebhooks(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Webhook::class);
+        return $this->hasMany(Webhook::class);
     }
 
     /**
@@ -283,7 +321,7 @@ class Workspace extends Model
      */
     public function socialAnalytics(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Analytics::class);
+        return $this->hasMany(Analytics::class);
     }
 
     /**
@@ -291,7 +329,7 @@ class Workspace extends Model
      */
     public function socialVariables(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Variable::class);
+        return $this->hasMany(Variable::class);
     }
 
     /**
@@ -299,7 +337,7 @@ class Workspace extends Model
      */
     public function socialPostingSchedule(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\PostingSchedule::class);
+        return $this->hasMany(PostingSchedule::class);
     }
 
     /**
@@ -307,7 +345,7 @@ class Workspace extends Model
      */
     public function socialImportedPosts(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\ImportedPost::class);
+        return $this->hasMany(ImportedPost::class);
     }
 
     /**
@@ -315,7 +353,7 @@ class Workspace extends Model
      */
     public function socialMetrics(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Metric::class);
+        return $this->hasMany(Metric::class);
     }
 
     /**
@@ -323,7 +361,7 @@ class Workspace extends Model
      */
     public function socialAudience(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\Audience::class);
+        return $this->hasMany(Audience::class);
     }
 
     /**
@@ -331,7 +369,7 @@ class Workspace extends Model
      */
     public function socialFacebookInsights(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\FacebookInsight::class);
+        return $this->hasMany(FacebookInsight::class);
     }
 
     /**
@@ -339,7 +377,7 @@ class Workspace extends Model
      */
     public function socialInstagramInsights(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\InstagramInsight::class);
+        return $this->hasMany(InstagramInsight::class);
     }
 
     /**
@@ -347,7 +385,7 @@ class Workspace extends Model
      */
     public function socialPinterestAnalytics(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Social\Models\PinterestAnalytic::class);
+        return $this->hasMany(PinterestAnalytic::class);
     }
 
     /**
@@ -376,7 +414,7 @@ class Workspace extends Model
      */
     public function analyticsSites(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Analytics\Models\Website::class);
+        return $this->hasMany(Website::class);
     }
 
     /**
@@ -384,7 +422,7 @@ class Workspace extends Model
      */
     public function socialAnalyticsWebsites(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Analytics\Models\AnalyticsWebsite::class);
+        return $this->hasMany(AnalyticsWebsite::class);
     }
 
     /**
@@ -392,7 +430,7 @@ class Workspace extends Model
      */
     public function analyticsGoals(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Analytics\Models\Goal::class);
+        return $this->hasMany(Goal::class);
     }
 
     /**
@@ -400,7 +438,7 @@ class Workspace extends Model
      */
     public function socialAnalyticsGoals(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Analytics\Models\AnalyticsGoal::class);
+        return $this->hasMany(AnalyticsGoal::class);
     }
 
     // TrustHost Relationships
@@ -410,7 +448,7 @@ class Workspace extends Model
      */
     public function trustWidgets(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Trust\Models\Campaign::class);
+        return $this->hasMany(Campaign::class);
     }
 
     /**
@@ -418,7 +456,7 @@ class Workspace extends Model
      */
     public function trustNotifications(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Trust\Models\Notification::class);
+        return $this->hasMany(Notification::class);
     }
 
     // NotifyHost Relationships
@@ -428,7 +466,7 @@ class Workspace extends Model
      */
     public function notificationSites(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Notify\Models\PushWebsite::class);
+        return $this->hasMany(PushWebsite::class);
     }
 
     /**
@@ -436,7 +474,7 @@ class Workspace extends Model
      */
     public function pushCampaigns(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Notify\Models\PushCampaign::class);
+        return $this->hasMany(PushCampaign::class);
     }
 
     /**
@@ -444,7 +482,7 @@ class Workspace extends Model
      */
     public function pushFlows(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Notify\Models\PushFlow::class);
+        return $this->hasMany(PushFlow::class);
     }
 
     /**
@@ -452,7 +490,7 @@ class Workspace extends Model
      */
     public function pushSegments(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Notify\Models\PushSegment::class);
+        return $this->hasMany(PushSegment::class);
     }
 
     // API & Webhooks Relationships
@@ -462,7 +500,7 @@ class Workspace extends Model
      */
     public function apiKeys(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Api\Models\ApiKey::class);
+        return $this->hasMany(ApiKey::class);
     }
 
     /**
@@ -470,7 +508,7 @@ class Workspace extends Model
      */
     public function webhookEndpoints(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Api\Models\WebhookEndpoint::class);
+        return $this->hasMany(WebhookEndpoint::class);
     }
 
     /**
@@ -488,7 +526,7 @@ class Workspace extends Model
      */
     public function treePlantings(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Trees\Models\TreePlanting::class);
+        return $this->hasMany(TreePlanting::class);
     }
 
     /**
@@ -519,7 +557,7 @@ class Workspace extends Model
      */
     public function contentItems(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Content\Models\ContentItem::class);
+        return $this->hasMany(ContentItem::class);
     }
 
     /**
@@ -527,7 +565,7 @@ class Workspace extends Model
      */
     public function contentAuthors(): HasMany
     {
-        return $this->hasMany(\Core\Mod\Content\Models\ContentAuthor::class);
+        return $this->hasMany(ContentAuthor::class);
     }
 
     // Commerce Relationships (defined in app Mod\Commerce)
@@ -537,7 +575,7 @@ class Workspace extends Model
      */
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(\Mod\Commerce\Models\Subscription::class);
+        return $this->hasMany(Subscription::class);
     }
 
     /**
@@ -545,7 +583,7 @@ class Workspace extends Model
      */
     public function invoices(): HasMany
     {
-        return $this->hasMany(\Mod\Commerce\Models\Invoice::class);
+        return $this->hasMany(Invoice::class);
     }
 
     /**
@@ -553,7 +591,7 @@ class Workspace extends Model
      */
     public function paymentMethods(): HasMany
     {
-        return $this->hasMany(\Mod\Commerce\Models\PaymentMethod::class);
+        return $this->hasMany(PaymentMethod::class);
     }
 
     /**
@@ -561,7 +599,7 @@ class Workspace extends Model
      */
     public function orders(): MorphMany
     {
-        return $this->morphMany(\Mod\Commerce\Models\Order::class, 'orderable');
+        return $this->morphMany(Order::class, 'orderable');
     }
 
     // Helper Methods
@@ -579,12 +617,12 @@ class Workspace extends Model
         }
 
         // Try to get from authenticated user's default workspace
-        if (auth()->check() && auth()->user() instanceof \Core\Tenant\Models\User) {
+        if (auth()->check() && auth()->user() instanceof User) {
             return auth()->user()->defaultHostWorkspace();
         }
 
         // Try to resolve from subdomain via WorkspaceService
-        $workspaceService = app(\App\Services\WorkspaceService::class);
+        $workspaceService = app(WorkspaceService::class);
         $slug = $workspaceService->currentSlug();
 
         return static::where('slug', $slug)->first();
@@ -609,7 +647,7 @@ class Workspace extends Model
     /**
      * Get usage summary for all features.
      */
-    public function getUsageSummary(): \Illuminate\Support\Collection
+    public function getUsageSummary(): Collection
     {
         return app(EntitlementService::class)->getUsageSummary($this);
     }
@@ -675,7 +713,7 @@ class Workspace extends Model
             $existing->save();
 
             // Send notification with the new plaintext token
-            $existing->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($existing, $plaintextToken));
+            $existing->notify(new WorkspaceInvitationNotification($existing, $plaintextToken));
 
             return $existing;
         }
@@ -693,7 +731,7 @@ class Workspace extends Model
         ]);
 
         // Send notification with the plaintext token (not the hashed one)
-        $invitation->notify(new \Core\Tenant\Notifications\WorkspaceInvitationNotification($invitation, $plaintextToken));
+        $invitation->notify(new WorkspaceInvitationNotification($invitation, $plaintextToken));
 
         return $invitation;
     }

@@ -7,6 +7,7 @@ use Core\Tenant\Notifications\WaitlistInviteNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Website\Host\View\Modal\Waitlist;
 
@@ -130,7 +131,7 @@ describe('Waitlist Entry Model', function () {
         expect($entry->invite_code)->toBeNull();
 
         $entry->update([
-            'invite_code' => \Illuminate\Support\Str::random(16),
+            'invite_code' => Str::random(16),
             'invited_at' => now(),
         ]);
 

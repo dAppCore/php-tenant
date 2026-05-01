@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\Database\Factories;
 
+use Core\Tenant\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Core\Tenant\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -17,7 +20,7 @@ class UserFactory extends Factory
      * Uses the backward-compatible alias class to ensure type compatibility
      * with existing code that expects Mod\Tenant\Models\User.
      */
-    protected $model = \Core\Tenant\Models\User::class;
+    protected $model = User::class;
 
     /**
      * The current password being used by the factory.

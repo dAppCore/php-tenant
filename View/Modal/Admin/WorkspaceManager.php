@@ -1,10 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\Tenant\View\Modal\Admin;
 
+use Core\Mod\Analytics\Models\Website;
+use Core\Mod\Notify\Models\PushWebsite;
+use Core\Mod\Social\Models\Account;
+use Core\Mod\Trust\Models\Campaign;
+use Core\Mod\Web\Models\Page;
+use Core\Mod\Web\Models\Project;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -117,15 +127,15 @@ class WorkspaceManager extends Component
 
         // Check each relation's model exists and has workspace_id column
         $checks = [
-            'bioPages' => ['model' => \Core\Mod\Web\Models\Page::class, 'table' => 'pages'],
-            'bioProjects' => ['model' => \Core\Mod\Web\Models\Project::class, 'table' => 'page_projects'],
-            'socialAccounts' => ['model' => \Core\Mod\Social\Models\Account::class, 'table' => 'social_accounts'],
-            'analyticsSites' => ['model' => \Core\Mod\Analytics\Models\Website::class, 'table' => 'analytics_websites'],
-            'trustWidgets' => ['model' => \Core\Mod\Trust\Models\Campaign::class, 'table' => 'trust_campaigns'],
-            'notificationSites' => ['model' => \Core\Mod\Notify\Models\PushWebsite::class, 'table' => 'push_websites'],
+            'bioPages' => ['model' => Page::class, 'table' => 'pages'],
+            'bioProjects' => ['model' => Project::class, 'table' => 'page_projects'],
+            'socialAccounts' => ['model' => Account::class, 'table' => 'social_accounts'],
+            'analyticsSites' => ['model' => Website::class, 'table' => 'analytics_websites'],
+            'trustWidgets' => ['model' => Campaign::class, 'table' => 'trust_campaigns'],
+            'notificationSites' => ['model' => PushWebsite::class, 'table' => 'push_websites'],
         ];
 
-        $schema = \Illuminate\Support\Facades\Schema::getFacadeRoot();
+        $schema = Schema::getFacadeRoot();
 
         foreach ($checks as $relation => $info) {
             if (class_exists($info['model'])) {
@@ -153,16 +163,16 @@ class WorkspaceManager extends Component
     public function resourceTypes(): array
     {
         $types = [];
-        $schema = \Illuminate\Support\Facades\Schema::getFacadeRoot();
+        $schema = Schema::getFacadeRoot();
 
         // Only include resource types for models that exist and have valid relations
         $checks = [
-            'bio_pages' => ['model' => \Core\Mod\Web\Models\Page::class, 'table' => 'pages', 'label' => 'Bio Pages', 'relation' => 'bioPages', 'icon' => 'link'],
-            'bio_projects' => ['model' => \Core\Mod\Web\Models\Project::class, 'table' => 'page_projects', 'label' => 'Bio Projects', 'relation' => 'bioProjects', 'icon' => 'folder'],
-            'social_accounts' => ['model' => \Core\Mod\Social\Models\Account::class, 'table' => 'social_accounts', 'label' => 'Social Accounts', 'relation' => 'socialAccounts', 'icon' => 'share-nodes'],
-            'analytics_sites' => ['model' => \Core\Mod\Analytics\Models\Website::class, 'table' => 'analytics_websites', 'label' => 'Analytics Sites', 'relation' => 'analyticsSites', 'icon' => 'chart-line'],
-            'trust_widgets' => ['model' => \Core\Mod\Trust\Models\Campaign::class, 'table' => 'trust_campaigns', 'label' => 'Trust Campaigns', 'relation' => 'trustWidgets', 'icon' => 'shield-check'],
-            'notification_sites' => ['model' => \Core\Mod\Notify\Models\PushWebsite::class, 'table' => 'push_websites', 'label' => 'Notification Sites', 'relation' => 'notificationSites', 'icon' => 'bell'],
+            'bio_pages' => ['model' => Page::class, 'table' => 'pages', 'label' => 'Bio Pages', 'relation' => 'bioPages', 'icon' => 'link'],
+            'bio_projects' => ['model' => Project::class, 'table' => 'page_projects', 'label' => 'Bio Projects', 'relation' => 'bioProjects', 'icon' => 'folder'],
+            'social_accounts' => ['model' => Account::class, 'table' => 'social_accounts', 'label' => 'Social Accounts', 'relation' => 'socialAccounts', 'icon' => 'share-nodes'],
+            'analytics_sites' => ['model' => Website::class, 'table' => 'analytics_websites', 'label' => 'Analytics Sites', 'relation' => 'analyticsSites', 'icon' => 'chart-line'],
+            'trust_widgets' => ['model' => Campaign::class, 'table' => 'trust_campaigns', 'label' => 'Trust Campaigns', 'relation' => 'trustWidgets', 'icon' => 'shield-check'],
+            'notification_sites' => ['model' => PushWebsite::class, 'table' => 'push_websites', 'label' => 'Notification Sites', 'relation' => 'notificationSites', 'icon' => 'bell'],
         ];
 
         foreach ($checks as $key => $info) {
@@ -530,7 +540,7 @@ class WorkspaceManager extends Component
                 'icon' => 'link',
                 'color' => 'blue',
                 'fields' => ['name', 'slug'],
-                'model' => \Core\Mod\Web\Models\Page::class,
+                'model' => Page::class,
                 'defaults' => ['type' => 'page', 'is_enabled' => true],
             ],
             'social_accounts' => [
@@ -538,7 +548,7 @@ class WorkspaceManager extends Component
                 'icon' => 'share-nodes',
                 'color' => 'purple',
                 'fields' => ['name'],
-                'model' => \Core\Mod\Social\Models\Account::class,
+                'model' => Account::class,
                 'defaults' => ['provider' => 'manual', 'status' => 'active'],
             ],
             'analytics_sites' => [
@@ -546,7 +556,7 @@ class WorkspaceManager extends Component
                 'icon' => 'chart-line',
                 'color' => 'cyan',
                 'fields' => ['name', 'url'],
-                'model' => \Core\Mod\Analytics\Models\Website::class,
+                'model' => Website::class,
                 'defaults' => ['tracking_enabled' => true, 'is_enabled' => true],
             ],
             'trust_widgets' => [
@@ -554,7 +564,7 @@ class WorkspaceManager extends Component
                 'icon' => 'shield-check',
                 'color' => 'emerald',
                 'fields' => ['name'],
-                'model' => \Core\Mod\Trust\Models\Campaign::class,
+                'model' => Campaign::class,
                 'defaults' => ['status' => 'draft'],
             ],
             'notification_sites' => [
@@ -562,7 +572,7 @@ class WorkspaceManager extends Component
                 'icon' => 'bell',
                 'color' => 'amber',
                 'fields' => ['name', 'url'],
-                'model' => \Core\Mod\Notify\Models\PushWebsite::class,
+                'model' => PushWebsite::class,
                 'defaults' => ['status' => 'active'],
             ],
         ];
@@ -615,7 +625,7 @@ class WorkspaceManager extends Component
 
         // Add slug for bio pages
         if (in_array('slug', $config['fields']) && $this->provisionSlug) {
-            $data['url'] = \Illuminate\Support\Str::slug($this->provisionSlug);
+            $data['url'] = Str::slug($this->provisionSlug);
         }
 
         // Add URL-related fields if applicable

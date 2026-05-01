@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Models;
 
+use Core\Tenant\Database\Factories\UserFactory;
 use Core\Tenant\Enums\UserTier;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,9 +25,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): \Core\Tenant\Database\Factories\UserFactory
+    protected static function newFactory(): UserFactory
     {
-        return \Core\Tenant\Database\Factories\UserFactory::new();
+        return UserFactory::new();
     }
 
     /**
@@ -235,7 +238,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get all namespaces accessible by this user (owned + via workspaces).
      */
-    public function accessibleNamespaces(): \Illuminate\Database\Eloquent\Builder
+    public function accessibleNamespaces(): Builder
     {
         return Namespace_::accessibleBy($this);
     }
@@ -269,7 +272,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
+        $this->notify(new VerifyEmail);
     }
 
     /**
