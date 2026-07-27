@@ -45,10 +45,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
-use Mod\Commerce\Models\Invoice;
-use Mod\Commerce\Models\Order;
-use Mod\Commerce\Models\PaymentMethod;
-use Mod\Commerce\Models\Subscription;
+use Core\Mod\Commerce\Models\Invoice;
+use Core\Mod\Commerce\Models\Order;
+use Core\Mod\Commerce\Models\PaymentMethod;
+use Core\Mod\Commerce\Models\Subscription;
 
 class Workspace extends Model
 {
@@ -568,7 +568,10 @@ class Workspace extends Model
         return $this->hasMany(ContentAuthor::class);
     }
 
-    // Commerce Relationships (defined in app Mod\Commerce)
+    // Commerce relationships. These live in dappcore/php-commerce under
+    // Core\Mod\Commerce, not in the consuming application — importing them
+    // from Mod\Commerce meant the relation resolved to a class that does not
+    // exist, and any call to subscriptions()/invoices()/orders() fatalled.
 
     /**
      * Get subscriptions for this workspace.
@@ -576,6 +579,22 @@ class Workspace extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * The workspace's current subscription, if it has one.
+     *
+     * Callers across the estate — the hub dashboard, account usage, workspace
+     * details — already expected this method; it was simply never defined, so
+     * every one of them raised a BadMethodCallException the moment it ran.
+     * They went unnoticed because each sits behind a workspace having active
+     * services, which nothing did until entitlements were populated.
+     *
+     * "Active" follows the subscription's own scope: active or trialing.
+     */
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()->active()->latest('id')->first();
     }
 
     /**

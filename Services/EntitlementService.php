@@ -1160,13 +1160,17 @@ class EntitlementService
             return $hasFeature ? $totalLimit : null;
         };
 
-        // Use tagged cache if available for O(1) invalidation
-        if ($this->supportsCacheTags()) {
-            return Cache::tags($this->getWorkspaceCacheTags($workspace, 'limit'))
-                ->remember($cacheKey, self::CACHE_TTL, $callback);
-        }
+        // Cast on the way out. The callback returns an int, but a cache store
+        // round-trip can hand it back as a numeric string — so a cache MISS
+        // satisfied the ?int return type and the following HIT threw a
+        // TypeError. That made any workspace holding a metered feature work
+        // once and fail on every request after.
+        $cached = $this->supportsCacheTags()
+            ? Cache::tags($this->getWorkspaceCacheTags($workspace, 'limit'))
+                ->remember($cacheKey, self::CACHE_TTL, $callback)
+            : Cache::remember($cacheKey, self::CACHE_TTL, $callback);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, $callback);
+        return $cached === null ? null : (int) $cached;
     }
 
     /**
@@ -1550,13 +1554,15 @@ class EntitlementService
             return $hasFeature ? $totalLimit : null;
         };
 
-        // Use tagged cache if available for O(1) invalidation
-        if ($this->supportsCacheTags()) {
-            return Cache::tags($this->getNamespaceCacheTags($namespace, 'limit'))
-                ->remember($cacheKey, self::CACHE_TTL, $callback);
-        }
+        // Cast on the way out, for the same reason as getTotalLimit(): a cache
+        // round-trip can return the int as a numeric string, so the hit would
+        // violate the ?int return type even though the miss did not.
+        $cached = $this->supportsCacheTags()
+            ? Cache::tags($this->getNamespaceCacheTags($namespace, 'limit'))
+                ->remember($cacheKey, self::CACHE_TTL, $callback)
+            : Cache::remember($cacheKey, self::CACHE_TTL, $callback);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, $callback);
+        return $cached === null ? null : (int) $cached;
     }
 
     /**
