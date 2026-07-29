@@ -1221,11 +1221,16 @@ class EntitlementService
 
         // Use tagged cache if available for O(1) invalidation
         if ($this->supportsCacheTags()) {
-            return Cache::tags($this->getWorkspaceCacheTags($workspace, 'usage'))
+            // Cast on the way out. A cache store that serialises to text —
+            // database, redis — returns a string, and the signature says int,
+            // so the second read of any usage figure was a TypeError. It only
+            // ever showed up once something had been cached, which is why the
+            // usage page failed and the dashboard beside it did not.
+            return (int) Cache::tags($this->getWorkspaceCacheTags($workspace, 'usage'))
                 ->remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
         }
 
-        return Cache::remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
+        return (int) Cache::remember($cacheKey, self::USAGE_CACHE_TTL, $callback);
     }
 
     /**

@@ -11,10 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Mod\Api\Controllers\Concerns\HasApiResponses;
-use Mod\Api\Controllers\Concerns\ResolvesWorkspace;
-use Mod\Api\Resources\PaginatedCollection;
-use Mod\Api\Resources\WorkspaceResource;
+use Core\Api\Concerns\HasApiResponses;
+use Core\Api\Concerns\ResolvesWorkspace;
+use Core\Api\Resources\PaginatedCollection;
+use Core\Api\Resources\WorkspaceResource;
 
 /**
  * Workspace API controller.

@@ -7,9 +7,17 @@ declare(strict_types=1);
  *
  * REST API for workspace management.
  * Supports both session auth and API key auth.
+ *
+ * Everything here is under `v1/`, which is not decoration. fireApiRoutes()
+ * applies the `api` middleware group and deliberately no prefix — API routes
+ * are expected to be domain-scoped, and a module that claims a bare path
+ * claims it on every domain the application serves. `prefix('workspaces')`
+ * did exactly that: it shadowed the panel's own /workspaces and
+ * /workspaces/create, so the workspace list answered with a container error
+ * and the creation wizard tried to load a workspace called "create".
  */
 
-use Core\Mod\Api\Controllers\WorkspaceController;
+use Core\Tenant\Controllers\WorkspaceController;
 use Core\Tenant\Controllers\Api\EntitlementWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth')->prefix('workspaces')->name('api.workspaces.')->group(function () {
+Route::middleware('auth')->prefix('v1/workspaces')->name('api.workspaces.')->group(function () {
     Route::get('/', [WorkspaceController::class, 'index'])
         ->name('index');
     Route::get('/current', [WorkspaceController::class, 'current'])
@@ -50,7 +58,7 @@ Route::middleware('auth')->prefix('workspaces')->name('api.workspaces.')->group(
 |
 */
 
-Route::middleware(['api.auth', 'api.scope.enforce'])->prefix('workspaces')->name('api.key.workspaces.')->group(function () {
+Route::middleware(['api.auth', 'api.scope.enforce'])->prefix('v1/workspaces')->name('api.key.workspaces.')->group(function () {
     // Scope enforcement: GET=read (all routes here are read-only)
     Route::get('/', [WorkspaceController::class, 'index'])->name('index');
     Route::get('/current', [WorkspaceController::class, 'current'])->name('current');
@@ -67,7 +75,7 @@ Route::middleware(['api.auth', 'api.scope.enforce'])->prefix('workspaces')->name
 |
 */
 
-Route::middleware('auth')->prefix('entitlement-webhooks')->name('api.entitlement-webhooks.')->group(function () {
+Route::middleware('auth')->prefix('v1/entitlement-webhooks')->name('api.entitlement-webhooks.')->group(function () {
     Route::get('/', [EntitlementWebhookController::class, 'index'])->name('index');
     Route::get('/events', [EntitlementWebhookController::class, 'events'])->name('events');
     Route::post('/', [EntitlementWebhookController::class, 'store'])->name('store');
