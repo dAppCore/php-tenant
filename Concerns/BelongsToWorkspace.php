@@ -186,7 +186,7 @@ trait BelongsToWorkspace
         $workspace = static::getCurrentWorkspace();
 
         if ($workspace) {
-            return static::getWorkspaceCacheManager()->rememberModel(
+            return static::getOwnershipCacheManager()->rememberModel(
                 $workspace,
                 static::class,
                 static::getDefaultCacheKey(),
@@ -196,7 +196,7 @@ trait BelongsToWorkspace
         }
 
         // No workspace context - check if we should enforce strict mode
-        $instance = new static;
+        $instance = new static();
         if ($instance->requiresWorkspaceContext()) {
             throw MissingWorkspaceContextException::forScope(
                 class_basename(static::class)
@@ -214,7 +214,7 @@ trait BelongsToWorkspace
      */
     public static function forWorkspaceCached(Workspace|int $workspace, ?int $ttl = null): Collection
     {
-        return static::getWorkspaceCacheManager()->rememberModel(
+        return static::getOwnershipCacheManager()->rememberModel(
             $workspace,
             static::class,
             static::getDefaultCacheKey(),
@@ -230,7 +230,7 @@ trait BelongsToWorkspace
      */
     public static function workspaceCacheKey(int $workspaceId): string
     {
-        return static::getWorkspaceCacheManager()->key(
+        return static::getOwnershipCacheManager()->key(
             $workspaceId,
             static::getDefaultCacheKey()
         );
@@ -254,7 +254,7 @@ trait BelongsToWorkspace
      */
     public static function clearWorkspaceCache(int $workspaceId): void
     {
-        static::getWorkspaceCacheManager()->forget(
+        static::getOwnershipCacheManager()->forget(
             $workspaceId,
             static::getDefaultCacheKey()
         );
@@ -268,7 +268,7 @@ trait BelongsToWorkspace
      */
     public static function clearAllWorkspaceCaches(): void
     {
-        $manager = static::getWorkspaceCacheManager();
+        $manager = static::getOwnershipCacheManager();
 
         // If tags are supported, we can flush all cache for this model efficiently
         if ($manager->supportsTags()) {
@@ -341,8 +341,18 @@ trait BelongsToWorkspace
 
     /**
      * Get the workspace cache manager instance.
+     *
+     * Named distinctly from HasWorkspaceCache::getWorkspaceCacheManager()
+     * even though both just resolve the same singleton: this trait's own
+     * cache-invalidation methods (see class docblock) must keep working when
+     * BelongsToWorkspace is used alone, and HasWorkspaceCache must keep
+     * working when used alone, so each trait needs its own copy of the
+     * resolver. A shared method name here would collide the moment a model
+     * uses both together — which the class docblock above documents as the
+     * supported way to add custom caching — and PHP fatals on trait method
+     * name collisions regardless of the two implementations being identical.
      */
-    protected static function getWorkspaceCacheManager(): WorkspaceCacheManager
+    protected static function getOwnershipCacheManager(): WorkspaceCacheManager
     {
         return app(WorkspaceCacheManager::class);
     }

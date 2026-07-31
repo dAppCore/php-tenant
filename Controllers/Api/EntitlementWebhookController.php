@@ -27,7 +27,8 @@ class EntitlementWebhookController extends Controller
 {
     public function __construct(
         protected EntitlementWebhookService $webhookService
-    ) {}
+    ) {
+    }
 
     /**
      * List webhooks for the current workspace.
@@ -54,7 +55,7 @@ class EntitlementWebhookController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'url', 'max:2048', new SafeWebhookUrl],
+            'url' => ['required', 'url', 'max:2048', new SafeWebhookUrl()],
             'events' => ['required', 'array', 'min:1'],
             'events.*' => ['string', Rule::in(EntitlementWebhook::EVENTS)],
             'secret' => ['nullable', 'string', 'min:32'],
@@ -109,7 +110,7 @@ class EntitlementWebhookController extends Controller
 
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'url' => ['sometimes', 'url', 'max:2048', new SafeWebhookUrl],
+            'url' => ['sometimes', 'url', 'max:2048', new SafeWebhookUrl()],
             'events' => ['sometimes', 'array', 'min:1'],
             'events.*' => ['string', Rule::in(EntitlementWebhook::EVENTS)],
             'is_active' => ['sometimes', 'boolean'],

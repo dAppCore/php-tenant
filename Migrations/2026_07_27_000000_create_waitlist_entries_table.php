@@ -17,8 +17,7 @@ use Illuminate\Support\Facades\Schema;
  * Columns are taken from the model's $fillable and $casts and from the factory's
  * definition, which together are the only specification that existed.
  */
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         // Guarded because consumers that hit the missing table may have created

@@ -24,7 +24,8 @@ class CheckWorkspacePermission
 {
     public function __construct(
         protected WorkspaceTeamService $teamService
-    ) {}
+    ) {
+    }
 
     public function handle(Request $request, Closure $next, string ...$permissions): Response
     {

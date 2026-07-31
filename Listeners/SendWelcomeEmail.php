@@ -16,6 +16,6 @@ class SendWelcomeEmail implements ShouldQueue
     public function handle(Registered $event): void
     {
         // Send welcome email after registration (queued)
-        $event->user->notify(new WelcomeNotification);
+        $event->user->notify(new WelcomeNotification());
     }
 }

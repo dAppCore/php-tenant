@@ -19,7 +19,8 @@ class ResolveNamespace
 {
     public function __construct(
         protected NamespaceService $namespaceService
-    ) {}
+    ) {
+    }
 
     /**
      * Handle an incoming request.

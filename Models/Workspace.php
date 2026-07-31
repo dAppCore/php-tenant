@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 
 class Workspace extends Model
 {
@@ -903,8 +904,12 @@ class Workspace extends Model
      */
     public function generateWpConnectorSecret(): string
     {
+        // wp_connector_secret is deliberately absent from $fillable so it can
+        // never be mass-assigned from a request; forceFill() is the sanctioned
+        // way for this trusted, server-generated write to still land — update()
+        // would silently drop the attribute and leave the secret unset.
         $secret = bin2hex(random_bytes(32));
-        $this->update(['wp_connector_secret' => $secret]);
+        $this->forceFill(['wp_connector_secret' => $secret])->save();
 
         return $secret;
     }
@@ -914,11 +919,11 @@ class Workspace extends Model
      */
     public function enableWpConnector(string $url): self
     {
-        $this->update([
+        $this->forceFill([
             'wp_connector_enabled' => true,
             'wp_connector_url' => rtrim($url, '/'),
             'wp_connector_secret' => $this->wp_connector_secret ?? bin2hex(random_bytes(32)),
-        ]);
+        ])->save();
 
         return $this;
     }
@@ -968,9 +973,25 @@ class Workspace extends Model
 
     /**
      * Get the webhook URL that external CMS should POST to.
+     *
+     * No route named `api.webhook.content` is registered by this package or
+     * any package it depends on — it does not exist, and never has. The
+     * nearest equivalent is php-content's `api.content.webhooks.receive`,
+     * but that route is keyed on a Core\Mod\Content\Models\ContentWebhookEndpoint
+     * UUID (its own secret, with rotation/grace-period support) rather than
+     * this workspace's wp_connector_secret, so it is not a like-for-like
+     * rename: pointing at it would validate signatures against the wrong
+     * secret. Until a real receiving endpoint for wp_connector_secret is
+     * built (or this feature is retired in favour of ContentWebhookEndpoint),
+     * degrade to null rather than let route() throw RouteNotFoundException
+     * and 500 the page.
      */
-    public function getWpConnectorWebhookUrlAttribute(): string
+    public function getWpConnectorWebhookUrlAttribute(): ?string
     {
+        if (! Route::has('api.webhook.content')) {
+            return null;
+        }
+
         return route('api.webhook.content').'?workspace='.$this->slug;
     }
 

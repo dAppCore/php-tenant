@@ -19,7 +19,8 @@ class LimitWarningEvent implements EntitlementWebhookEvent
         protected int $used,
         protected int $limit,
         protected int $threshold = 80
-    ) {}
+    ) {
+    }
 
     public static function name(): string
     {

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Core\Tenant\Controllers;
 
+use Core\Api\Concerns\HasApiResponses;
+use Core\Api\Concerns\ResolvesWorkspace;
+use Core\Api\Resources\PaginatedCollection;
+use Core\Api\Resources\WorkspaceResource;
 use Core\Front\Controller;
 use Core\Tenant\Models\User;
 use Core\Tenant\Models\Workspace;
@@ -11,10 +15,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Core\Api\Concerns\HasApiResponses;
-use Core\Api\Concerns\ResolvesWorkspace;
-use Core\Api\Resources\PaginatedCollection;
-use Core\Api\Resources\WorkspaceResource;
 
 /**
  * Workspace API controller.

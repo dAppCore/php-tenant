@@ -20,7 +20,9 @@ use Laravel\Pennant\Concerns\HasFeatures;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, HasFeatures, Notifiable;
+    use HasFactory;
+    use HasFeatures;
+    use Notifiable;
 
     /**
      * Create a new factory instance for the model.
@@ -272,7 +274,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail);
+        $this->notify(new VerifyEmail());
     }
 
     /**

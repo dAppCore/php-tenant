@@ -18,7 +18,8 @@ class LimitReachedEvent implements EntitlementWebhookEvent
         protected Feature $feature,
         protected int $used,
         protected int $limit
-    ) {}
+    ) {
+    }
 
     public static function name(): string
     {

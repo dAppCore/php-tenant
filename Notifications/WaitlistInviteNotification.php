@@ -16,7 +16,8 @@ class WaitlistInviteNotification extends Notification implements ShouldQueue
 
     public function __construct(
         protected WaitlistEntry $entry
-    ) {}
+    ) {
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -36,7 +37,7 @@ class WaitlistInviteNotification extends Notification implements ShouldQueue
         $registerUrl = route('register', ['invite' => $this->entry->invite_code]);
         $name = $this->entry->name ?: 'there';
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Your Host UK invite is ready')
             ->greeting("Hello {$name},")
             ->line('Good news. Your spot on the Host UK waitlist has come up and you can now create your account.')

@@ -23,7 +23,8 @@ class WorkspaceInvitationNotification extends Notification implements ShouldQueu
     public function __construct(
         protected WorkspaceInvitation $invitation,
         protected string $plaintextToken
-    ) {}
+    ) {
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -47,7 +48,7 @@ class WorkspaceInvitationNotification extends Notification implements ShouldQueu
         $roleName = ucfirst($this->invitation->role);
         $expiresAt = $this->invitation->expires_at->format('j F Y');
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject("You've been invited to join {$workspaceName}")
             ->greeting('Hello,')
             ->line("{$inviterName} has invited you to join **{$workspaceName}** as a **{$roleName}**.")

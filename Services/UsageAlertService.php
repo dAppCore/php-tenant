@@ -29,7 +29,8 @@ class UsageAlertService
     public function __construct(
         protected EntitlementService $entitlementService,
         protected ?EntitlementWebhookService $webhookService = null
-    ) {}
+    ) {
+    }
 
     /**
      * Check all workspaces for usage alerts.

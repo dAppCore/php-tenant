@@ -339,7 +339,7 @@ class MemberManager extends Component
             }
         }
 
-        return new Collection;
+        return new Collection();
     }
 
     #[Computed]
@@ -352,7 +352,7 @@ class MemberManager extends Component
                 ->get();
         }
 
-        return new Collection;
+        return new Collection();
     }
 
     #[Computed]

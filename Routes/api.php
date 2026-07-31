@@ -17,8 +17,8 @@ declare(strict_types=1);
  * and the creation wizard tried to load a workspace called "create".
  */
 
-use Core\Tenant\Controllers\WorkspaceController;
 use Core\Tenant\Controllers\Api\EntitlementWebhookController;
+use Core\Tenant\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 /*

@@ -18,7 +18,8 @@ class PackageChangedEvent implements EntitlementWebhookEvent
         protected ?Package $previousPackage,
         protected Package $newPackage,
         protected string $changeType = 'changed' // 'added', 'changed', 'removed'
-    ) {}
+    ) {
+    }
 
     public static function name(): string
     {

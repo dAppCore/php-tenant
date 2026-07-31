@@ -25,7 +25,8 @@ class UsageAlertNotification extends Notification implements ShouldQueue
         protected int $threshold,
         protected int $used,
         protected int $limit
-    ) {}
+    ) {
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -48,7 +49,7 @@ class UsageAlertNotification extends Notification implements ShouldQueue
         $workspaceName = $this->workspace->name;
         $appName = config('core.app.name', 'Host UK');
 
-        $message = (new MailMessage)
+        $message = (new MailMessage())
             ->subject($this->getSubject($featureName, $percentage));
 
         if ($this->threshold === UsageAlertHistory::THRESHOLD_LIMIT) {

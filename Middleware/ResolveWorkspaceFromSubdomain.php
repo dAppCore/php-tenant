@@ -19,7 +19,8 @@ class ResolveWorkspaceFromSubdomain
 
     public function __construct(
         protected WorkspaceService $workspaceService
-    ) {}
+    ) {
+    }
 
     /**
      * Handle an incoming request.

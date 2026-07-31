@@ -15,14 +15,16 @@ use Illuminate\Queue\SerializesModels;
 
 class AccountDeletionRequested extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new message instance.
      */
     public function __construct(
         public AccountDeletionRequest $deletionRequest
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.

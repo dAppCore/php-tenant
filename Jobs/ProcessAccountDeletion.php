@@ -22,7 +22,10 @@ use Illuminate\Support\Facades\Log;
  */
 class ProcessAccountDeletion implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * The number of times the job may be attempted.
@@ -39,7 +42,8 @@ class ProcessAccountDeletion implements ShouldQueue
      */
     public function __construct(
         public AccountDeletionRequest $deletionRequest
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.

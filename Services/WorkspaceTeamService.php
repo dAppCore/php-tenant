@@ -17,11 +17,8 @@ use Illuminate\Support\Facades\Log;
  */
 class WorkspaceTeamService
 {
-    protected ?Workspace $workspace = null;
-
-    public function __construct(?Workspace $workspace = null)
+    public function __construct(protected ?Workspace $workspace = null)
     {
-        $this->workspace = $workspace;
     }
 
     /**
@@ -68,7 +65,7 @@ class WorkspaceTeamService
     {
         $workspace = $this->getWorkspace();
         if (! $workspace) {
-            return new Collection;
+            return new Collection();
         }
 
         return WorkspaceTeam::where('workspace_id', $workspace->id)
@@ -251,7 +248,7 @@ class WorkspaceTeamService
     {
         $workspace = $this->getWorkspace();
         if (! $workspace) {
-            return new Collection;
+            return new Collection();
         }
 
         return WorkspaceMember::where('workspace_id', $workspace->id)
@@ -266,7 +263,7 @@ class WorkspaceTeamService
     {
         $workspace = $this->getWorkspace();
         if (! $workspace) {
-            return new Collection;
+            return new Collection();
         }
 
         $teamId = $team instanceof WorkspaceTeam ? $team->id : $team;
@@ -520,7 +517,7 @@ class WorkspaceTeamService
             throw new \RuntimeException('No workspace context available for seeding.');
         }
 
-        $teams = new Collection;
+        $teams = new Collection();
 
         foreach (WorkspaceTeam::getDefaultTeamDefinitions() as $definition) {
             // Check if team already exists
@@ -564,7 +561,7 @@ class WorkspaceTeamService
     {
         $workspace = $this->getWorkspace();
         if (! $workspace) {
-            return new Collection;
+            return new Collection();
         }
 
         // Check if any teams exist

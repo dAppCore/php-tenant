@@ -28,7 +28,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Welcome to Host UK')
             ->greeting('Hello '.($notifiable->name ?: 'there').',')
             ->line('Thanks for creating your Host UK account. You\'re all set to start building your online presence.')

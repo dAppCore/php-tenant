@@ -21,8 +21,7 @@ use Illuminate\Support\Facades\Schema;
  * timestamps rather than a status column, because "when" answers "whether" and
  * a status would need all four anyway.
  */
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         if (Schema::hasTable('account_deletion_requests')) {

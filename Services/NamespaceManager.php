@@ -19,14 +19,15 @@ class NamespaceManager
 {
     public function __construct(
         protected NamespaceService $namespaceService
-    ) {}
+    ) {
+    }
 
     /**
      * Create a namespace for a user.
      */
     public function createForUser(User $user, array $data): Namespace_
     {
-        $namespace = new Namespace_;
+        $namespace = new Namespace_();
         $namespace->fill([
             'name' => $data['name'],
             'slug' => $data['slug'] ?? Str::slug($data['name']),
@@ -62,7 +63,7 @@ class NamespaceManager
      */
     public function createForWorkspace(Workspace $workspace, array $data): Namespace_
     {
-        $namespace = new Namespace_;
+        $namespace = new Namespace_();
         $namespace->fill([
             'name' => $data['name'],
             'slug' => $data['slug'] ?? Str::slug($data['name']),

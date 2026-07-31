@@ -27,7 +27,8 @@ class CheckUserPasswordRule implements ValidationRule
     public function __construct(
         protected User $user,
         protected ?string $message = null
-    ) {}
+    ) {
+    }
 
     /**
      * Run the validation rule.

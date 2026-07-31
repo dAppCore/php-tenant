@@ -17,7 +17,8 @@ class EntitlementResult
         public readonly ?int $remaining = null,
         public readonly ?string $featureCode = null,
         public readonly array $metadata = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Create an allowed result.

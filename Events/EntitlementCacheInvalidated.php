@@ -69,7 +69,8 @@ class EntitlementCacheInvalidated
         public readonly ?Namespace_ $namespace,
         public readonly array $featureCodes,
         public readonly string $reason
-    ) {}
+    ) {
+    }
 
     /**
      * Create an event for workspace cache invalidation.

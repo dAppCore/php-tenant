@@ -13,7 +13,8 @@ class UnlimitedWorkspaces
 {
     public function __construct(
         protected EntitlementService $entitlements
-    ) {}
+    ) {
+    }
 
     /**
      * Resolve the feature's initial value.

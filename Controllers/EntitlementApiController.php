@@ -45,7 +45,8 @@ class EntitlementApiController extends Controller
 {
     public function __construct(
         protected EntitlementService $entitlements
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new entitlement for a workspace.

@@ -14,7 +14,10 @@ use Illuminate\Queue\SerializesModels;
 
 class ComputeUserStats implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 3;
 
@@ -25,7 +28,8 @@ class ComputeUserStats implements ShouldQueue
      */
     public function __construct(
         public int $userId
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.

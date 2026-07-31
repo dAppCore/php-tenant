@@ -18,7 +18,8 @@ class BoostActivatedEvent implements EntitlementWebhookEvent
         protected Workspace $workspace,
         protected Boost $boost,
         protected ?Feature $feature = null
-    ) {}
+    ) {
+    }
 
     public static function name(): string
     {

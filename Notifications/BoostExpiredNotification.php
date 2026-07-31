@@ -23,7 +23,8 @@ class BoostExpiredNotification extends Notification implements ShouldQueue
     public function __construct(
         protected Workspace $workspace,
         protected Collection $expiredBoosts
-    ) {}
+    ) {
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -44,7 +45,7 @@ class BoostExpiredNotification extends Notification implements ShouldQueue
         $appName = config('core.app.name', 'Host UK');
         $boostCount = $this->expiredBoosts->count();
 
-        $message = (new MailMessage)
+        $message = (new MailMessage())
             ->subject($this->getSubject($boostCount, $workspaceName))
             ->greeting('Hi,');
 
