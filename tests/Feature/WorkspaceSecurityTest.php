@@ -279,7 +279,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_throws_without_workspace_context(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
         $request = Request::create('/test', 'GET');
 
         $this->expectException(MissingWorkspaceContextException::class);
@@ -289,7 +289,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_passes_with_workspace_model_attribute(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
         $request = Request::create('/test', 'GET');
         $request->attributes->set('workspace_model', $this->workspace);
 
@@ -300,7 +300,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_resolves_workspace_from_header(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
         $request = Request::create('/test', 'GET');
         $request->headers->set('X-Workspace-ID', (string) $this->workspace->id);
 
@@ -312,7 +312,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_resolves_workspace_from_query(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
         $request = Request::create('/test?workspace='.$this->workspace->slug, 'GET');
 
         $response = $middleware->handle($request, fn () => response('OK'));
@@ -322,7 +322,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_validates_user_access_when_requested(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
 
         // Create another workspace the user doesn't have access to
         $otherWorkspace = Workspace::factory()->create(['name' => 'Other Workspace']);
@@ -340,7 +340,7 @@ class WorkspaceSecurityTest extends TestCase
 
     public function test_middleware_allows_access_to_user_workspace(): void
     {
-        $middleware = new RequireWorkspaceContext;
+        $middleware = new RequireWorkspaceContext();
 
         $this->actingAs($this->user);
         $request = Request::create('/test', 'GET');
@@ -415,8 +415,7 @@ class WorkspaceSecurityTest extends TestCase
     public function test_model_can_opt_out_of_strict_workspace_context(): void
     {
         // Create a test model class that opts out
-        $model = new class extends Model
-        {
+        $model = new class () extends Model {
             use BelongsToWorkspace;
 
             protected $table = 'test_models';

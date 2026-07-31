@@ -11,6 +11,10 @@ use Core\Mod\Analytics\Models\Goal;
 use Core\Mod\Analytics\Models\Website;
 use Core\Mod\Api\Models\ApiKey;
 use Core\Mod\Api\Models\WebhookEndpoint;
+use Core\Mod\Commerce\Models\Invoice;
+use Core\Mod\Commerce\Models\Order;
+use Core\Mod\Commerce\Models\PaymentMethod;
+use Core\Mod\Commerce\Models\Subscription;
 use Core\Mod\Content\Models\ContentAuthor;
 use Core\Mod\Content\Models\ContentItem;
 use Core\Mod\Notify\Models\PushCampaign;
@@ -41,14 +45,11 @@ use Core\Tenant\Services\EntitlementResult;
 use Core\Tenant\Services\EntitlementService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
-use Core\Mod\Commerce\Models\Invoice;
-use Core\Mod\Commerce\Models\Order;
-use Core\Mod\Commerce\Models\PaymentMethod;
-use Core\Mod\Commerce\Models\Subscription;
 
 class Workspace extends Model
 {
@@ -60,6 +61,7 @@ class Workspace extends Model
     }
 
     protected $fillable = [
+        'parent_id',
         'name',
         'slug',
         'domain',
@@ -115,6 +117,90 @@ class Workspace extends Model
     protected $hidden = [
         'wp_connector_secret',
     ];
+
+    /**
+     * The workspace this one belongs to, if any.
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * The workspaces belonging to this one — direct children only.
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Every workspace above this one, nearest first.
+     *
+     * Walks rather than recursing through the relation so one query per level
+     * is the worst case, and stops on a cycle: parent_id is a plain column and
+     * nothing at the database level prevents A→B→A, so a walk that trusted the
+     * data would hang the request rather than return a wrong answer.
+     *
+     * @return list<self>
+     */
+    public function ancestors(): array
+    {
+        $ancestors = [];
+        $seen = [(int) $this->getKey()];
+        $current = $this;
+
+        while (($parentId = $current->parent_id) !== null) {
+            if (in_array((int) $parentId, $seen, true)) {
+                break;
+            }
+
+            $parent = self::query()->find($parentId);
+
+            if ($parent === null) {
+                break;
+            }
+
+            $ancestors[] = $parent;
+            $seen[] = (int) $parentId;
+            $current = $parent;
+        }
+
+        return $ancestors;
+    }
+
+    /**
+     * The workspace at the top of this one's tree.
+     */
+    public function root(): self
+    {
+        $ancestors = $this->ancestors();
+
+        return $ancestors === [] ? $this : end($ancestors);
+    }
+
+    /**
+     * Whether this workspace is at or below the given one.
+     *
+     * The question an authorisation check asks: a parent may act on its
+     * children, so "is this mine" has to mean "mine or under mine".
+     */
+    public function isWithin(self|int $workspace): bool
+    {
+        $target = (int) ($workspace instanceof self ? $workspace->getKey() : $workspace);
+
+        if ((int) $this->getKey() === $target) {
+            return true;
+        }
+
+        foreach ($this->ancestors() as $ancestor) {
+            if ((int) $ancestor->getKey() === $target) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Get the users that have access to this workspace.

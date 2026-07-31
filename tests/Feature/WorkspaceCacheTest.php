@@ -417,8 +417,7 @@ class WorkspaceCacheTest extends TestCase
         request()->attributes->set('workspace_model', $this->workspace);
 
         // Create a model class that uses HasWorkspaceCache
-        $testModel = new class extends Model
-        {
+        $testModel = new class () extends Model {
             use BelongsToWorkspace;
             use HasWorkspaceCache;
 
@@ -451,8 +450,7 @@ class WorkspaceCacheTest extends TestCase
         $this->actingAs($this->user);
         request()->attributes->set('workspace_model', $this->workspace);
 
-        $testModel = new class extends Model
-        {
+        $testModel = new class () extends Model {
             use BelongsToWorkspace;
             use HasWorkspaceCache;
 
@@ -474,8 +472,7 @@ class WorkspaceCacheTest extends TestCase
         request()->attributes->remove('workspace_model');
         WorkspaceScope::disableStrictMode();
 
-        $testModel = new class extends Model
-        {
+        $testModel = new class () extends Model {
             use BelongsToWorkspace;
             use HasWorkspaceCache;
 
