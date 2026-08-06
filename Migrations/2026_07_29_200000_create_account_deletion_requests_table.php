@@ -56,7 +56,11 @@ return new class () extends Migration {
 
             // The query every page load makes: this user's requests that have
             // neither completed nor been cancelled.
-            $table->index(['user_id', 'completed_at', 'cancelled_at']);
+            // Named because the auto-generated name is 65 characters and
+            // MariaDB stops at 64 — the unnamed form has never survived a
+            // clean migrate on MariaDB, and it dies loudly enough to take
+            // every later migration with it.
+            $table->index(['user_id', 'completed_at', 'cancelled_at'], 'adr_user_completed_cancelled_idx');
         });
     }
 
